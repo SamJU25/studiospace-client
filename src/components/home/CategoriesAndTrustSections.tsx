@@ -116,15 +116,18 @@ export function CategoriesAndTrustSections() {
                     className="absolute inset-0 h-full w-full object-cover opacity-75 transition-transform duration-500 group-hover:scale-[1.03]"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+                  <span
+                    aria-hidden="true"
+                    className="absolute right-3.5 top-3.5 z-10 flex h-7 w-7 items-center justify-center rounded-full border border-white/15 bg-black/35 text-white/75 opacity-75 backdrop-blur-sm transition-all duration-200 group-hover:border-white/35 group-hover:text-white group-hover:opacity-100"
+                  >
+                    <ArrowUpRight className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                  </span>
                   <div className="relative z-10 space-y-1.5">
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="flex items-center gap-2">
-                        <Icon className="h-4 w-4 text-primary shrink-0" />
-                        <h3 className="font-display text-base font-bold tracking-tight">
-                          {cat.name}
-                        </h3>
-                      </div>
-                      <ArrowUpRight className="h-4 w-4 text-white/60 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-white shrink-0" />
+                    <div className="flex items-center gap-2">
+                      <Icon className="h-4 w-4 shrink-0 text-white/85" />
+                      <h3 className="font-display text-[15px] font-semibold tracking-tight leading-snug whitespace-nowrap">
+                        {cat.name}
+                      </h3>
                     </div>
                     <p className="text-xs leading-relaxed text-neutral-200">
                       {cat.description}
