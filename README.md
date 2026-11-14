@@ -2,8 +2,8 @@
 
 **StudioSpace** connects photographers, filmmakers, podcasters, musicians, and makers with hourly creative studios and production spaces hosted by fellow creators.
 
-- **Live Website:** https://studiospace-client.vercel.app *(replace with deployed Vercel URL)*
-- **API Server:** https://studiospace-server.vercel.app *(replace with deployed server URL)*
+- **Live Website:** https://studiospace-client-azure.vercel.app
+- **API Server:** https://studiospace-server-sigma-steel.vercel.app
 
 ## Key Features
 
