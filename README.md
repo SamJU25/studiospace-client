@@ -46,9 +46,9 @@
    npm run dev
    ```
 
-4. **Seed demo studios (optional, once MongoDB is connected):**
+4. **Seed demo studios (optional, once MongoDB is connected and `SEED_SECRET` is set in server `.env`):**
    ```bash
-   curl -X POST http://localhost:5000/api/seed
+   curl -X POST http://localhost:5000/api/seed -H "x-seed-key: <your_SEED_SECRET>"
    ```
 
 ## Examiner Test Credentials
