@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowUpRight, CheckCircle2, ShieldCheck } from "lucide-react";
+import { ArrowRight, CheckCircle2, ShieldCheck } from "lucide-react";
 import { STUDIO_CATEGORIES } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 
@@ -135,10 +135,10 @@ export default function AboutPage() {
           </div>
           <Link
             href="/how-it-works"
-            className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
           >
             Read how booking works
-            <ArrowUpRight className="h-4 w-4" />
+            <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
 
@@ -147,12 +147,11 @@ export default function AboutPage() {
             <Link
               key={category}
               href={`/studios?category=${encodeURIComponent(category)}`}
-              className="group flex items-center justify-between border-border p-5 transition-colors hover:bg-secondary/40 sm:border-b lg:border-b-0"
+              className="group flex items-center justify-center border-border p-5 text-center transition-colors hover:bg-secondary/40 sm:border-b lg:border-b-0"
             >
-              <span className="font-display text-sm font-bold text-foreground group-hover:text-primary transition-colors">
+              <span className="font-display text-sm font-bold text-foreground transition-colors group-hover:text-primary">
                 {category}
               </span>
-              <ArrowUpRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-primary" />
             </Link>
           ))}
         </div>
