@@ -117,13 +117,13 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/#how-it-works" className="hover:text-primary transition-colors">
+                <Link href="/how-it-works" className="hover:text-primary transition-colors">
                   How Booking Works
                 </Link>
               </li>
               <li>
-                <Link href="/#about-us" className="hover:text-primary transition-colors">
-                  Host Guarantee
+                <Link href="/about" className="hover:text-primary transition-colors">
+                  About &amp; Host Guarantee
                 </Link>
               </li>
               <li>
@@ -180,13 +180,13 @@ export function Footer() {
         <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-border pt-6 text-xs text-muted-foreground sm:flex-row">
           <p>© {new Date().getFullYear()} StudioSpace Inc. All rights reserved.</p>
           <div className="flex items-center gap-6">
-            <Link href="/#about-us" className="hover:text-foreground transition-colors">
+            <Link href="/about" className="hover:text-foreground transition-colors">
               Terms of Service
             </Link>
-            <Link href="/#about-us" className="hover:text-foreground transition-colors">
+            <Link href="/about" className="hover:text-foreground transition-colors">
               Privacy Policy
             </Link>
-            <Link href="/#about-us" className="hover:text-foreground transition-colors">
+            <Link href="/about" className="hover:text-foreground transition-colors">
               Host Insurance
             </Link>
           </div>

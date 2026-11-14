@@ -6,6 +6,8 @@
 - `/` — Home overview with hero showcase, top 6 featured studios, studio categories, and workflow.
 - `/studios` — Full studio directory with category filtering, keyword search, sorting, and pagination.
 - `/studios/{id}` — Studio details, equipment gallery, live confirmed time slots, creator reviews, and booking modal.
+- `/how-it-works` — Step-by-step booking guide for creators, host onboarding flow, and scheduling FAQ.
+- `/about` — Platform mission, host guarantee standards, and supported creative disciplines.
 - `/login`, `/register` — Email/password and Google OAuth authentication powered by BetterAuth.
 
 ## Private Workspace Routes (Session-Protected via `src/proxy.ts`)

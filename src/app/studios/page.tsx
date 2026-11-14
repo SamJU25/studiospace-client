@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Plus, RotateCcw, Search, SlidersHorizontal } from "lucide-react";
+import { Plus, RotateCcw, Search, SlidersHorizontal, X } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 import { apiFetch } from "@/lib/api";
 import { STUDIO_CATEGORIES, type Studio } from "@/lib/types";
@@ -168,14 +168,21 @@ function ExploreStudiosContent() {
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               placeholder="Search by title, city, or gear (e.g. Profoto, SM7B)..."
-              className="pl-10 pr-10"
+              className="pl-10 pr-9"
             />
-            <kbd
-              aria-hidden="true"
-              className="pointer-events-none absolute right-3 top-1/2 hidden -translate-y-1/2 rounded border border-border bg-secondary px-1.5 py-0.5 font-mono text-[11px] text-muted-foreground sm:inline-block"
-            >
-              /
-            </kbd>
+            {searchInput && (
+              <button
+                type="button"
+                aria-label="Clear search"
+                onClick={() => {
+                  setSearchInput("");
+                  searchInputRef.current?.focus();
+                }}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-md p-1 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground cursor-pointer"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            )}
           </div>
 
           <div className="flex items-center gap-3">
