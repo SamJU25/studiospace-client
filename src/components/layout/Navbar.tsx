@@ -108,17 +108,15 @@ export function Navbar() {
               <Link
                 key={item.href}
                 href={item.href}
+                aria-current={isActive ? "page" : undefined}
                 className={cn(
-                  "relative rounded-lg px-3.5 py-2 text-sm font-medium transition-colors",
+                  "rounded-lg px-3.5 py-2 text-sm font-medium transition-colors",
                   isActive
-                    ? "text-accent-foreground bg-accent"
-                    : "text-muted-foreground hover:text-foreground hover:bg-secondary/70"
+                    ? "bg-accent text-accent-foreground"
+                    : "text-muted-foreground hover:bg-secondary/70 hover:text-foreground"
                 )}
               >
                 {item.label}
-                {isActive && (
-                  <span className="absolute inset-x-3.5 -bottom-[17px] h-0.5 rounded-full bg-primary" />
-                )}
               </Link>
             );
           })}
