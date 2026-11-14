@@ -20,7 +20,7 @@ import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
 import { clearServerCookie } from "@/lib/api";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { ThemeToggle } from "./ThemeToggle";
 
 const NAV_LINKS = [
@@ -94,7 +94,7 @@ export function Navbar() {
         <Link
           href="/"
           onClick={closeMenus}
-          className="flex items-center gap-2.5 group focus-visible:outline-none"
+          className="flex items-center gap-2.5 group rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
         >
           <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm transition-transform group-hover:scale-105">
             <Aperture className="h-5 w-5" />
@@ -138,14 +138,18 @@ export function Navbar() {
             <div
               className="relative hidden sm:block"
               ref={dropdownRef}
-              onMouseEnter={() => setDropdownOpen(true)}
-              onMouseLeave={() => setDropdownOpen(false)}
+              onBlur={(e) => {
+                if (!e.currentTarget.contains(e.relatedTarget as Node | null)) {
+                  setDropdownOpen(false);
+                }
+              }}
             >
               <button
                 type="button"
                 onClick={() => setDropdownOpen((prev) => !prev)}
                 aria-expanded={dropdownOpen}
-                className="flex items-center gap-2 rounded-full border border-border bg-card py-1 pl-1.5 pr-3 text-sm font-medium text-foreground hover:bg-secondary transition-colors cursor-pointer"
+                aria-haspopup="menu"
+                className="flex h-9 items-center gap-2 rounded-full border border-border bg-card pl-1.5 pr-3 text-sm font-medium text-foreground hover:bg-secondary transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               >
                 {user.image ? (
                   <img
@@ -232,13 +236,17 @@ export function Navbar() {
             </div>
           ) : (
             <div className="hidden sm:flex items-center gap-2">
-              <Link href="/login">
-                <Button variant="ghost" size="sm">
-                  Login
-                </Button>
+              <Link
+                href="/login"
+                className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "h-9 px-3.5")}
+              >
+                Login
               </Link>
-              <Link href="/register">
-                <Button size="sm">Register</Button>
+              <Link
+                href="/register"
+                className={cn(buttonVariants({ size: "sm" }), "h-9 px-3.5")}
+              >
+                Register
               </Link>
             </div>
           )}
@@ -247,8 +255,10 @@ export function Navbar() {
           <button
             type="button"
             onClick={() => setMobileOpen((prev) => !prev)}
+            aria-expanded={mobileOpen}
+            aria-controls="mobile-nav-drawer"
             aria-label="Toggle navigation menu"
-            className="inline-flex md:hidden h-9 w-9 items-center justify-center rounded-lg border border-border bg-card text-foreground hover:bg-secondary cursor-pointer"
+            className="inline-flex md:hidden h-9 w-9 items-center justify-center rounded-lg border border-border bg-card text-foreground hover:bg-secondary cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           >
             {mobileOpen ? (
               <X className="h-5 w-5" />
@@ -261,7 +271,10 @@ export function Navbar() {
 
       {/* Mobile Drawer */}
       {mobileOpen && (
-        <div className="md:hidden border-t border-border bg-card px-4 py-4 space-y-2">
+        <div
+          id="mobile-nav-drawer"
+          className="md:hidden border-t border-border bg-card px-4 py-4 space-y-2"
+        >
           {NAV_LINKS.map((item) => {
             const isActive = isNavItemActive(item.href, pathname);
             return (
@@ -288,38 +301,95 @@ export function Navbar() {
                 <div className="px-3 py-1.5 text-xs text-muted-foreground">
                   Signed in as <strong className="text-foreground">{user.name || user.email}</strong>
                 </div>
-                <Link href="/dashboard" onClick={closeMenus} className="block rounded-lg px-3 py-2 text-sm hover:bg-secondary">
+                <Link
+                  href="/dashboard"
+                  onClick={closeMenus}
+                  className={cn(
+                    "flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm",
+                    pathname.startsWith("/dashboard")
+                      ? "bg-accent text-accent-foreground font-medium"
+                      : "hover:bg-secondary"
+                  )}
+                >
+                  <LayoutDashboard className="h-4 w-4 text-muted-foreground" />
                   Dashboard
                 </Link>
-                <Link href="/add-studio" onClick={closeMenus} className="block rounded-lg px-3 py-2 text-sm hover:bg-secondary">
+                <Link
+                  href="/add-studio"
+                  onClick={closeMenus}
+                  className={cn(
+                    "flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm",
+                    pathname.startsWith("/add-studio")
+                      ? "bg-accent text-accent-foreground font-medium"
+                      : "hover:bg-secondary"
+                  )}
+                >
+                  <PlusSquare className="h-4 w-4 text-muted-foreground" />
                   Add New Studio
                 </Link>
-                <Link href="/my-listings" onClick={closeMenus} className="block rounded-lg px-3 py-2 text-sm hover:bg-secondary">
+                <Link
+                  href="/my-listings"
+                  onClick={closeMenus}
+                  className={cn(
+                    "flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm",
+                    pathname.startsWith("/my-listings")
+                      ? "bg-accent text-accent-foreground font-medium"
+                      : "hover:bg-secondary"
+                  )}
+                >
+                  <ListMusic className="h-4 w-4 text-muted-foreground" />
                   My Studio Listings
                 </Link>
-                <Link href="/my-bookings" onClick={closeMenus} className="block rounded-lg px-3 py-2 text-sm hover:bg-secondary">
+                <Link
+                  href="/my-bookings"
+                  onClick={closeMenus}
+                  className={cn(
+                    "flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm",
+                    pathname.startsWith("/my-bookings")
+                      ? "bg-accent text-accent-foreground font-medium"
+                      : "hover:bg-secondary"
+                  )}
+                >
+                  <CalendarCheck className="h-4 w-4 text-muted-foreground" />
                   My Bookings
                 </Link>
-                <Link href="/wishlist" onClick={closeMenus} className="block rounded-lg px-3 py-2 text-sm hover:bg-secondary">
+                <Link
+                  href="/wishlist"
+                  onClick={closeMenus}
+                  className={cn(
+                    "flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm",
+                    pathname.startsWith("/wishlist")
+                      ? "bg-accent text-accent-foreground font-medium"
+                      : "hover:bg-secondary"
+                  )}
+                >
+                  <Heart className="h-4 w-4 text-muted-foreground" />
                   Saved Studios
                 </Link>
                 <button
                   type="button"
                   onClick={handleLogout}
-                  className="w-full text-left rounded-lg px-3 py-2 text-sm font-medium text-destructive hover:bg-destructive/10 cursor-pointer"
+                  className="flex w-full items-center gap-2.5 text-left rounded-lg px-3 py-2 text-sm font-medium text-destructive hover:bg-destructive/10 cursor-pointer"
                 >
+                  <LogOut className="h-4 w-4" />
                   Logout
                 </button>
               </>
             ) : (
               <div className="flex gap-2 pt-1">
-                <Link href="/login" className="flex-1">
-                  <Button variant="outline" className="w-full">
-                    Login
-                  </Button>
+                <Link
+                  href="/login"
+                  onClick={closeMenus}
+                  className={cn(buttonVariants({ variant: "outline" }), "flex-1")}
+                >
+                  Login
                 </Link>
-                <Link href="/register" className="flex-1">
-                  <Button className="w-full">Register</Button>
+                <Link
+                  href="/register"
+                  onClick={closeMenus}
+                  className={cn(buttonVariants(), "flex-1")}
+                >
+                  Register
                 </Link>
               </div>
             )}

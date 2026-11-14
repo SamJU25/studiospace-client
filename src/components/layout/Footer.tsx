@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Aperture, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 import { STUDIO_CATEGORIES } from "@/lib/types";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 export function Footer() {
@@ -17,7 +17,7 @@ export function Footer() {
       toast.error("Please enter a valid email address.");
       return;
     }
-    toast.success("Subscribed to StudioSpace dispatches and new studio drops.");
+    toast.info("Dispatch preview saved for this browser session.");
     setEmail("");
   };
 
@@ -102,9 +102,9 @@ export function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h3 className="font-display text-sm font-bold uppercase tracking-wider text-foreground">
+            <h2 className="font-display text-sm font-bold uppercase tracking-wider text-foreground">
               Quick Links
-            </h3>
+            </h2>
             <ul className="mt-4 space-y-2.5 text-sm text-muted-foreground">
               <li>
                 <Link href="/studios" className="hover:text-primary transition-colors">
@@ -136,9 +136,9 @@ export function Footer() {
 
           {/* Popular Categories */}
           <div>
-            <h3 className="font-display text-sm font-bold uppercase tracking-wider text-foreground">
+            <h2 className="font-display text-sm font-bold uppercase tracking-wider text-foreground">
               Studio Categories
-            </h3>
+            </h2>
             <ul className="mt-4 space-y-2.5 text-sm text-muted-foreground">
               {STUDIO_CATEGORIES.map((category) => (
                 <li key={category}>
@@ -155,9 +155,9 @@ export function Footer() {
 
           {/* Newsletter */}
           <div>
-            <h3 className="font-display text-sm font-bold uppercase tracking-wider text-foreground">
+            <h2 className="font-display text-sm font-bold uppercase tracking-wider text-foreground">
               Creator Dispatch
-            </h3>
+            </h2>
             <p className="mt-4 text-sm text-muted-foreground">
               Get curated acoustic rooms, daylight lofts, and seasonal host
               rates straight to your inbox.
@@ -170,23 +170,27 @@ export function Footer() {
                 placeholder="you@studio.com"
                 aria-label="Newsletter email"
               />
-              <Button type="submit" size="icon" aria-label="Subscribe">
+              <button
+                type="submit"
+                aria-label="Subscribe"
+                className={buttonVariants({ size: "icon" })}
+              >
                 <ArrowRight className="h-4 w-4" />
-              </Button>
+              </button>
             </form>
           </div>
         </div>
 
         <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-border pt-6 text-xs text-muted-foreground sm:flex-row">
           <p>© {new Date().getFullYear()} StudioSpace Inc. All rights reserved.</p>
-          <div className="flex items-center gap-6">
-            <Link href="/about" className="hover:text-foreground transition-colors">
+          <div className="flex flex-wrap items-center justify-center gap-6">
+            <Link href="/about#terms" className="hover:text-foreground transition-colors">
               Terms of Service
             </Link>
-            <Link href="/about" className="hover:text-foreground transition-colors">
+            <Link href="/about#privacy" className="hover:text-foreground transition-colors">
               Privacy Policy
             </Link>
-            <Link href="/about" className="hover:text-foreground transition-colors">
+            <Link href="/about#guarantee" className="hover:text-foreground transition-colors">
               Host Insurance
             </Link>
           </div>

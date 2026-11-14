@@ -4,36 +4,51 @@ import * as React from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
-import { apiFetch } from "@/lib/api";
+import { apiFetch, ApiError } from "@/lib/api";
 import type { Studio } from "@/lib/types";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { StudioForm } from "@/components/studios/StudioForm";
 
 export default function EditStudioPage() {
   const { id } = useParams<{ id: string }>();
   const [studio, setStudio] = React.useState<Studio | null>(null);
-  const [loadedId, setLoadedId] = React.useState<string>("");
+  const [loadedKey, setLoadedKey] = React.useState<string>("");
+  const [reloadNonce, setReloadNonce] = React.useState(0);
+  const [fetchError, setFetchError] = React.useState("");
 
-  const loading = loadedId !== id;
+  const requestKey = `${id}:${reloadNonce}`;
+  const loading = loadedKey !== requestKey;
 
   React.useEffect(() => {
     let active = true;
-    apiFetch<{ studio: Studio }>(`/api/studios/${id}`)
+    apiFetch<{ studio: Studio }>(`/api/studios/${id}`, { requireAuth: true })
       .then((res) => {
-        if (active) setStudio(res.studio);
+        if (!active) return;
+        setFetchError("");
+        setStudio(res.studio);
       })
-      .catch(() => {
-        if (active) setStudio(null);
+      .catch((err) => {
+        if (!active) return;
+        setStudio(null);
+        if (err instanceof ApiError && err.status === 404) {
+          setFetchError("");
+        } else {
+          setFetchError(
+            err instanceof Error
+              ? err.message
+              : "Could not load studio details."
+          );
+        }
       })
       .finally(() => {
-        if (active) setLoadedId(id);
+        if (active) setLoadedKey(requestKey);
       });
 
     return () => {
       active = false;
     };
-  }, [id]);
+  }, [id, requestKey]);
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
@@ -62,9 +77,45 @@ export default function EditStudioPage() {
         </div>
       ) : !studio ? (
         <div className="rounded-2xl border border-border bg-card p-10 text-center">
-          <p className="font-semibold text-foreground">Studio not found</p>
-          <Link href="/my-listings" className="mt-4 inline-block">
-            <Button variant="outline">Return to My Listings</Button>
+          <p className="font-semibold text-foreground">
+            {fetchError ? "Unable to load studio" : "Studio not found"}
+          </p>
+          {fetchError && (
+            <p className="mt-2 text-sm text-muted-foreground">{fetchError}</p>
+          )}
+          <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
+            {fetchError && (
+              <Button
+                type="button"
+                onClick={() => {
+                  setFetchError("");
+                  setReloadNonce((n) => n + 1);
+                }}
+              >
+                Try again
+              </Button>
+            )}
+            <Link
+              href="/my-listings"
+              className={buttonVariants({ variant: "outline" })}
+            >
+              Return to My Listings
+            </Link>
+          </div>
+        </div>
+      ) : studio.isOwner === false ? (
+        <div className="rounded-2xl border border-border bg-card p-10 text-center">
+          <p className="font-semibold text-foreground">
+            You do not have permission to edit this studio
+          </p>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Only the verified owner of this listing can modify its rates or details.
+          </p>
+          <Link
+            href="/my-listings"
+            className={buttonVariants({ variant: "outline", className: "mt-5" })}
+          >
+            Return to My Listings
           </Link>
         </div>
       ) : (

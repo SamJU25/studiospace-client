@@ -9,7 +9,7 @@ import {
   ShieldCheck,
   SlidersHorizontal,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 
 export const metadata: Metadata = {
   title: "How It Works | StudioSpace",
@@ -60,7 +60,7 @@ const HOST_STEPS = [
     code: "HOST 02",
     title: "Approve conflict-free bookings",
     description:
-      "Incoming requests are automatically validated against confirmed bookings on your calendar—zero double-booking surprises.",
+      "Incoming requests are automatically validated against confirmed bookings on your calendar, preventing double-booking surprises.",
     icon: SlidersHorizontal,
   },
   {
@@ -100,7 +100,7 @@ export default function HowItWorksPage() {
     <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
       {/* Header */}
       <div className="max-w-3xl border-b border-border pb-10">
-        <h1 className="font-display text-3xl font-bold tracking-tight text-foreground sm:text-5xl">
+        <h1 className="font-display text-3xl font-extrabold tracking-tight text-foreground sm:text-5xl">
           How booking a studio works
         </h1>
         <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
@@ -108,13 +108,14 @@ export default function HowItWorksPage() {
           every StudioSpace session follows a clear, conflict-free schedule.
         </p>
         <div className="mt-6 flex flex-wrap gap-3">
-          <Link href="/studios">
-            <Button size="lg">Explore Studios</Button>
+          <Link href="/studios" className={buttonVariants({ size: "lg" })}>
+            Explore Studios
           </Link>
-          <Link href="/add-studio">
-            <Button size="lg" variant="outline">
-              Host Your Studio
-            </Button>
+          <Link
+            href="/add-studio"
+            className={buttonVariants({ size: "lg", variant: "outline" })}
+          >
+            Host Your Studio
           </Link>
         </div>
       </div>

@@ -2,7 +2,7 @@ import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
-const buttonVariants = cva(
+export const buttonVariants = cva(
   "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-semibold transition-all duration-150 disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background cursor-pointer active:scale-[0.99]",
   {
     variants: {
@@ -15,7 +15,7 @@ const buttonVariants = cva(
           "border border-border bg-card text-foreground hover:bg-secondary/70",
         ghost: "text-foreground hover:bg-secondary/70",
         destructive:
-          "bg-destructive text-white shadow-sm hover:opacity-92",
+          "bg-destructive text-destructive-foreground shadow-sm hover:opacity-92",
       },
       size: {
         default: "h-10 px-4 py-2",

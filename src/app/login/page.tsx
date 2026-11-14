@@ -75,7 +75,7 @@ function LoginForm() {
       }
     } catch {
       toast.error(
-        "Google sign-in could not start. Check OAuth configuration in .env."
+        "Google sign-in is currently unavailable. Please sign in with email and password."
       );
     } finally {
       setGoogleLoading(false);
@@ -121,7 +121,7 @@ function LoginForm() {
                     "Password recovery is handled by your workspace administrator in this demo."
                   )
                 }
-                className="text-xs font-medium text-primary hover:underline cursor-pointer"
+                className="rounded text-xs font-medium text-primary hover:underline cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               >
                 Forgot password?
               </button>
@@ -142,7 +142,7 @@ function LoginForm() {
                 type="button"
                 onClick={() => setShowPassword((prev) => !prev)}
                 aria-label={showPassword ? "Hide password" : "Show password"}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground cursor-pointer"
+                className="absolute right-3 top-1/2 -translate-y-1/2 rounded p-0.5 text-muted-foreground hover:text-foreground cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
                 {showPassword ? (
                   <EyeOff className="h-4 w-4" />

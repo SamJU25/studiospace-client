@@ -25,7 +25,7 @@ import { apiFetch, ApiError } from "@/lib/api";
 import type { ConfirmedSlot, Review, Studio } from "@/lib/types";
 import { cn, formatCurrency } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
@@ -50,10 +50,13 @@ export default function StudioDetailsPage() {
   const [confirmedSlots, setConfirmedSlots] = React.useState<ConfirmedSlot[]>(
     []
   );
-  const [loadedId, setLoadedId] = React.useState<string>("");
+  const [loadedKey, setLoadedKey] = React.useState<string>("");
+  const [reloadNonce, setReloadNonce] = React.useState(0);
+  const [fetchError, setFetchError] = React.useState("");
   const [isSaved, setIsSaved] = React.useState(false);
 
-  const loading = loadedId !== id;
+  const requestKey = `${id}:${reloadNonce}`;
+  const loading = loadedKey !== requestKey;
 
   // Booking Modal State
   const [bookingModalOpen, setBookingModalOpen] = React.useState(false);
@@ -81,21 +84,32 @@ export default function StudioDetailsPage() {
     }>(`/api/studios/${id}`)
       .then((res) => {
         if (!active) return;
+        setFetchError("");
         setStudio(res.studio);
         setReviews(res.reviews || []);
         setConfirmedSlots(res.confirmedSlots || []);
       })
-      .catch(() => {
-        if (active) setStudio(null);
+      .catch((err) => {
+        if (!active) return;
+        setStudio(null);
+        if (err instanceof ApiError && err.status === 404) {
+          setFetchError("");
+        } else {
+          setFetchError(
+            err instanceof Error
+              ? err.message
+              : "Could not load this studio right now."
+          );
+        }
       })
       .finally(() => {
-        if (active) setLoadedId(id);
+        if (active) setLoadedKey(requestKey);
       });
 
     return () => {
       active = false;
     };
-  }, [id]);
+  }, [id, requestKey]);
 
   React.useEffect(() => {
     if (!userId || !id) return;
@@ -252,14 +266,33 @@ export default function StudioDetailsPage() {
     return (
       <div className="mx-auto flex min-h-[60vh] max-w-xl flex-col items-center justify-center px-4 text-center">
         <h1 className="font-display text-2xl font-bold text-foreground">
-          Studio listing not found
+          {fetchError ? "Unable to load studio" : "Studio listing not found"}
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          This studio may have been removed or the URL is incorrect.
+          {fetchError ||
+            "This studio may have been removed or the URL is incorrect."}
         </p>
-        <Link href="/studios" className="mt-6">
-          <Button>Back to Explore Studios</Button>
-        </Link>
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+          {fetchError && (
+            <Button
+              type="button"
+              onClick={() => {
+                setFetchError("");
+                setReloadNonce((n) => n + 1);
+              }}
+            >
+              Try again
+            </Button>
+          )}
+          <Link
+            href="/studios"
+            className={buttonVariants({
+              variant: fetchError ? "outline" : "default",
+            })}
+          >
+            Back to Explore Studios
+          </Link>
+        </div>
       </div>
     );
   }
@@ -326,8 +359,9 @@ export default function StudioDetailsPage() {
               <Badge>{studio.category}</Badge>
               <span className="inline-flex items-center gap-1 rounded-full bg-secondary px-2.5 py-0.5 text-xs font-semibold tabular-nums">
                 <Star className="h-3.5 w-3.5 fill-amber-500 text-amber-500" />
-                {Number(studio.rating || 5).toFixed(1)} ({studio.reviewCount || 0}{" "}
-                reviews)
+                {(studio.reviewCount ?? 0) > 0
+                  ? `${Number(studio.rating || 0).toFixed(1)} (${studio.reviewCount} reviews)`
+                  : "New"}
               </span>
             </div>
 
@@ -403,7 +437,7 @@ export default function StudioDetailsPage() {
                   {studio.ownerName}
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  {studio.ownerEmail}
+                  {studio.ownerEmail || "Verified StudioSpace Host"}
                 </p>
               </div>
             </div>
@@ -427,16 +461,38 @@ export default function StudioDetailsPage() {
                   role="radiogroup"
                   aria-labelledby="review-rating-label"
                   className="flex items-center gap-1"
+                  onKeyDown={(e) => {
+                    let next = reviewRating;
+                    if (e.key === "ArrowRight" || e.key === "ArrowUp") {
+                      next = reviewRating === 5 ? 1 : reviewRating + 1;
+                    } else if (e.key === "ArrowLeft" || e.key === "ArrowDown") {
+                      next = reviewRating === 1 ? 5 : reviewRating - 1;
+                    } else if (e.key === "Home") {
+                      next = 1;
+                    } else if (e.key === "End") {
+                      next = 5;
+                    } else {
+                      return;
+                    }
+                    e.preventDefault();
+                    setReviewRating(next);
+                    const target = e.currentTarget.querySelector<HTMLButtonElement>(
+                      `[data-rating="${next}"]`
+                    );
+                    target?.focus();
+                  }}
                 >
                   {[1, 2, 3, 4, 5].map((num) => (
                     <button
                       key={num}
                       type="button"
                       role="radio"
+                      data-rating={num}
+                      tabIndex={num === reviewRating ? 0 : -1}
                       aria-checked={num === reviewRating}
                       onClick={() => setReviewRating(num)}
                       aria-label={`Rate ${num} star${num > 1 ? "s" : ""}`}
-                      className="inline-flex h-9 w-9 items-center justify-center rounded-lg hover:bg-secondary cursor-pointer transition-colors"
+                      className="inline-flex h-9 w-9 items-center justify-center rounded-lg hover:bg-secondary cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                     >
                       <Star
                         className={cn(

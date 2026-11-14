@@ -3,6 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import {
+  AlertTriangle,
   ArrowRight,
   Building2,
   CalendarCheck,
@@ -13,7 +14,8 @@ import {
 import { authClient } from "@/lib/auth-client";
 import { apiFetch } from "@/lib/api";
 import type { Booking, Studio } from "@/lib/types";
-import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function DashboardPage() {
@@ -26,44 +28,66 @@ export default function DashboardPage() {
     saved: 0,
   });
   const [fetchedForUser, setFetchedForUser] = React.useState<string>("");
+  const [loadWarning, setLoadWarning] = React.useState(false);
+  const [reloadNonce, setReloadNonce] = React.useState(0);
 
   React.useEffect(() => {
     if (isPending || !userId) return;
 
     let active = true;
-    Promise.all([
+    Promise.allSettled([
       apiFetch<{ studios: Studio[] }>("/api/studios/my-listings", {
         requireAuth: true,
-      }).catch(() => ({ studios: [] })),
+      }),
       apiFetch<{ bookings: Booking[] }>("/api/bookings/my", {
         requireAuth: true,
-      }).catch(() => ({ bookings: [] })),
+      }),
       apiFetch<{ bookings: Booking[] }>("/api/bookings/host", {
         requireAuth: true,
-      }).catch(() => ({ bookings: [] })),
+      }),
       apiFetch<{ studioIds: string[] }>("/api/wishlist", {
         requireAuth: true,
-      }).catch(() => ({ studioIds: [] })),
+      }),
     ])
       .then(([listingsRes, myBookingsRes, hostBookingsRes, wishlistRes]) => {
         if (!active) return;
+        const anyRejected = [
+          listingsRes,
+          myBookingsRes,
+          hostBookingsRes,
+          wishlistRes,
+        ].some((r) => r.status === "rejected");
+        setLoadWarning(anyRejected);
         setCounts({
-          listings: listingsRes.studios?.length || 0,
-          myBookings: myBookingsRes.bookings?.length || 0,
-          hostRequests: hostBookingsRes.bookings?.length || 0,
-          saved: wishlistRes.studioIds?.length || 0,
+          listings:
+            listingsRes.status === "fulfilled"
+              ? listingsRes.value.studios?.length || 0
+              : 0,
+          myBookings:
+            myBookingsRes.status === "fulfilled"
+              ? myBookingsRes.value.bookings?.length || 0
+              : 0,
+          hostRequests:
+            hostBookingsRes.status === "fulfilled"
+              ? hostBookingsRes.value.bookings?.length || 0
+              : 0,
+          saved:
+            wishlistRes.status === "fulfilled"
+              ? wishlistRes.value.studioIds?.length || 0
+              : 0,
         });
       })
       .finally(() => {
-        if (active) setFetchedForUser(userId);
+        if (active) setFetchedForUser(`${userId}:${reloadNonce}`);
       });
 
     return () => {
       active = false;
     };
-  }, [isPending, userId]);
+  }, [isPending, userId, reloadNonce]);
 
-  const loading = isPending || (Boolean(userId) && fetchedForUser !== userId);
+  const loading =
+    isPending || (Boolean(userId) && fetchedForUser !== `${userId}:${reloadNonce}`);
 
   const user = session?.user;
 
@@ -112,13 +136,31 @@ export default function DashboardPage() {
           </p>
         </div>
 
-        <Link href="/add-studio">
-          <Button className="gap-2">
-            <PlusSquare className="h-4 w-4" />
-            Add New Studio
-          </Button>
+        <Link href="/add-studio" className={cn(buttonVariants(), "gap-2")}>
+          <PlusSquare className="h-4 w-4" />
+          Add New Studio
         </Link>
       </div>
+
+      {loadWarning && !loading && (
+        <div
+          role="alert"
+          className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive"
+        >
+          <span className="inline-flex items-center gap-2">
+            <AlertTriangle className="h-4 w-4 shrink-0" />
+            Some dashboard metrics could not be loaded.
+          </span>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => setReloadNonce((n) => n + 1)}
+          >
+            Retry
+          </Button>
+        </div>
+      )}
 
       {loading ? (
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">

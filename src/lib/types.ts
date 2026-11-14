@@ -21,7 +21,8 @@ export interface Studio {
   amenities: string[];
   description: string;
   ownerName: string;
-  ownerEmail: string;
+  ownerEmail?: string;
+  isOwner?: boolean;
   ownerImage?: string;
   rating: number;
   reviewCount: number;

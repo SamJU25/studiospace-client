@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, CheckCircle2, ShieldCheck } from "lucide-react";
+import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { STUDIO_CATEGORIES } from "@/lib/types";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 
 export const metadata: Metadata = {
   title: "About Us | StudioSpace",
@@ -33,7 +33,7 @@ export default function AboutPage() {
     <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
       {/* Header */}
       <div className="max-w-3xl border-b border-border pb-10">
-        <h1 className="font-display text-3xl font-bold tracking-tight text-foreground sm:text-5xl">
+        <h1 className="font-display text-3xl font-extrabold tracking-tight text-foreground sm:text-5xl">
           Creative rooms without the scheduling friction
         </h1>
         <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
@@ -44,15 +44,13 @@ export default function AboutPage() {
       </div>
 
       {/* Host Guarantee & Visual */}
-      <section className="grid grid-cols-1 items-center gap-10 py-12 sm:py-14 lg:grid-cols-2">
+      <section
+        id="guarantee"
+        className="scroll-mt-24 grid grid-cols-1 items-center gap-10 py-12 sm:py-14 lg:grid-cols-2"
+      >
         <div className="space-y-5">
-          <div className="inline-flex items-center gap-2 rounded-full bg-accent px-3.5 py-1.5 text-xs font-semibold text-accent-foreground">
-            <ShieldCheck className="h-4 w-4" />
-            <span>Host Guarantee &amp; Creator Support</span>
-          </div>
-
           <h2 className="font-display text-2xl font-bold tracking-tight text-foreground sm:text-4xl">
-            Protected studios. Clear terms for every shoot.
+            Host Guarantee &amp; clear terms for every shoot.
           </h2>
 
           <p className="max-w-xl text-base leading-relaxed text-muted-foreground">
@@ -77,13 +75,14 @@ export default function AboutPage() {
           </ul>
 
           <div className="flex flex-wrap gap-3 pt-2">
-            <Link href="/studios">
-              <Button size="lg">Browse Studios</Button>
+            <Link href="/studios" className={buttonVariants({ size: "lg" })}>
+              Browse Studios
             </Link>
-            <Link href="/add-studio">
-              <Button size="lg" variant="outline">
-                List Your Space
-              </Button>
+            <Link
+              href="/add-studio"
+              className={buttonVariants({ size: "lg", variant: "outline" })}
+            >
+              List Your Space
             </Link>
           </div>
         </div>
@@ -154,6 +153,33 @@ export default function AboutPage() {
               </span>
             </Link>
           ))}
+        </div>
+      </section>
+
+      {/* Terms & Privacy */}
+      <section className="mt-12 grid grid-cols-1 gap-8 border-t border-border pt-12 sm:mt-14 sm:pt-14 md:grid-cols-2">
+        <div id="terms" className="scroll-mt-24 rounded-2xl border border-border bg-card p-6">
+          <h2 className="font-display text-xl font-bold tracking-tight text-foreground">
+            Booking Terms
+          </h2>
+          <p className="mt-2.5 text-sm leading-relaxed text-muted-foreground">
+            All reservations begin in Pending status until the studio host
+            confirms crew size, house rules, and overlap-free hours. Pending
+            requests can be cancelled before confirmation; security deposits
+            shown on a listing are settled directly around session wrap-up.
+          </p>
+        </div>
+
+        <div id="privacy" className="scroll-mt-24 rounded-2xl border border-border bg-card p-6">
+          <h2 className="font-display text-xl font-bold tracking-tight text-foreground">
+            Privacy &amp; Data Protection
+          </h2>
+          <p className="mt-2.5 text-sm leading-relaxed text-muted-foreground">
+            Account sessions use signed, HTTP-only authentication cookies, and
+            host contact details remain private on public listings. Project
+            notes and booking receipts are accessible only to the booking
+            creator and verified studio host.
+          </p>
         </div>
       </section>
     </div>

@@ -19,7 +19,7 @@ import { generateBookingInvoicePdf } from "@/lib/invoice";
 import type { Booking, BookingStatus } from "@/lib/types";
 import { cn, formatCurrency } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Modal } from "@/components/ui/modal";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -42,11 +42,15 @@ export default function MyBookingsPage() {
   const [activeTab, setActiveTab] = React.useState<"guest" | "host">("guest");
   const [myBookings, setMyBookings] = React.useState<Booking[]>([]);
   const [hostBookings, setHostBookings] = React.useState<Booking[]>([]);
-  const [fetchedForUser, setFetchedForUser] = React.useState<string>("");
+  const [fetchedKey, setFetchedKey] = React.useState<string>("");
+  const [reloadNonce, setReloadNonce] = React.useState(0);
+  const [fetchError, setFetchError] = React.useState("");
   const [bookingToCancel, setBookingToCancel] = React.useState<Booking | null>(
     null
   );
   const [processingId, setProcessingId] = React.useState<string | null>(null);
+
+  const requestKey = userId ? `${userId}:${reloadNonce}` : "";
 
   React.useEffect(() => {
     if (isPending || !userId) return;
@@ -62,26 +66,28 @@ export default function MyBookingsPage() {
     ])
       .then(([guestRes, hostRes]) => {
         if (!active) return;
+        setFetchError("");
         setMyBookings(guestRes.bookings || []);
         setHostBookings(hostRes.bookings || []);
       })
       .catch((err) => {
         if (active) {
-          toast.error(
-            err instanceof Error ? err.message : "Failed to load bookings."
-          );
+          const message =
+            err instanceof Error ? err.message : "Failed to load bookings.";
+          setFetchError(message);
+          toast.error(message);
         }
       })
       .finally(() => {
-        if (active) setFetchedForUser(userId);
+        if (active) setFetchedKey(requestKey);
       });
 
     return () => {
       active = false;
     };
-  }, [isPending, userId]);
+  }, [isPending, userId, requestKey]);
 
-  const loading = isPending || (Boolean(userId) && fetchedForUser !== userId);
+  const loading = isPending || (Boolean(userId) && fetchedKey !== requestKey);
 
   const handleConfirmCancelBooking = async () => {
     if (!bookingToCancel) return;
@@ -150,8 +156,11 @@ export default function MyBookingsPage() {
           </p>
         </div>
 
-        <Link href="/studios">
-          <Button variant="outline">Browse More Studios</Button>
+        <Link
+          href="/studios"
+          className={buttonVariants({ variant: "outline" })}
+        >
+          Browse More Studios
         </Link>
       </div>
 
@@ -189,6 +198,25 @@ export default function MyBookingsPage() {
             <Skeleton key={idx} className="h-36 w-full rounded-2xl" />
           ))}
         </div>
+      ) : fetchError ? (
+        <div className="mt-10 flex flex-col items-center justify-center rounded-2xl border border-border bg-card px-6 py-14 text-center">
+          <h2 className="font-display text-xl font-bold text-foreground">
+            Unable to load bookings
+          </h2>
+          <p className="mt-2 max-w-md text-sm text-muted-foreground">
+            {fetchError}
+          </p>
+          <Button
+            type="button"
+            className="mt-6"
+            onClick={() => {
+              setFetchError("");
+              setReloadNonce((n) => n + 1);
+            }}
+          >
+            Try again
+          </Button>
+        </div>
       ) : activeList.length === 0 ? (
         <div className="mt-10 flex flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-card px-6 py-16 text-center">
           <CalendarX2 className="h-10 w-10 text-muted-foreground" />
@@ -204,11 +232,9 @@ export default function MyBookingsPage() {
           </p>
           <Link
             href={activeTab === "guest" ? "/studios" : "/add-studio"}
-            className="mt-6"
+            className={buttonVariants({ className: "mt-6" })}
           >
-            <Button>
-              {activeTab === "guest" ? "Explore Studios" : "List a Studio"}
-            </Button>
+            {activeTab === "guest" ? "Explore Studios" : "List a Studio"}
           </Link>
         </div>
       ) : (

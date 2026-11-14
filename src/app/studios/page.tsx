@@ -3,12 +3,12 @@
 import * as React from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Plus, RotateCcw, Search, SlidersHorizontal, X } from "lucide-react";
+import { AlertTriangle, Plus, RotateCcw, Search, SlidersHorizontal, X } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 import { apiFetch } from "@/lib/api";
 import { STUDIO_CATEGORIES, type Studio } from "@/lib/types";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { StudioCardSkeleton } from "@/components/ui/skeleton";
@@ -34,6 +34,8 @@ function ExploreStudiosContent() {
   const [studios, setStudios] = React.useState<Studio[]>([]);
   const [savedIds, setSavedIds] = React.useState<Set<string>>(new Set());
   const [fetchedKey, setFetchedKey] = React.useState<string>("");
+  const [fetchError, setFetchError] = React.useState(false);
+  const [reloadNonce, setReloadNonce] = React.useState(0);
 
   const searchInputRef = React.useRef<HTMLInputElement>(null);
 
@@ -78,7 +80,7 @@ function ExploreStudiosContent() {
     return params.toString();
   }, [selectedCategory, debouncedSearch, sortBy]);
 
-  const requestKey = `${selectedCategory}|${debouncedSearch}|${sortBy}`;
+  const requestKey = `${selectedCategory}|${debouncedSearch}|${sortBy}|${reloadNonce}`;
   const loading = fetchedKey !== requestKey;
 
   React.useEffect(() => {
@@ -89,10 +91,16 @@ function ExploreStudiosContent() {
 
     apiFetch<{ studios: Studio[] }>(url)
       .then((res) => {
-        if (active) setStudios(res.studios || []);
+        if (active) {
+          setFetchError(false);
+          setStudios(res.studios || []);
+        }
       })
       .catch(() => {
-        if (active) setStudios([]);
+        if (active) {
+          setFetchError(true);
+          setStudios([]);
+        }
       })
       .finally(() => {
         if (active) setFetchedKey(requestKey);
@@ -149,11 +157,12 @@ function ExploreStudiosContent() {
           </p>
         </div>
 
-        <Link href="/add-studio">
-          <Button className="gap-2">
-            <Plus className="h-4 w-4" />
-            Host Your Studio
-          </Button>
+        <Link
+          href="/add-studio"
+          className={cn(buttonVariants(), "gap-2")}
+        >
+          <Plus className="h-4 w-4" />
+          Host Your Studio
         </Link>
       </div>
 
@@ -231,6 +240,28 @@ function ExploreStudiosContent() {
           {Array.from({ length: 6 }).map((_, idx) => (
             <StudioCardSkeleton key={idx} />
           ))}
+        </div>
+      ) : fetchError ? (
+        <div
+          role="alert"
+          className="mt-12 flex flex-col items-center justify-center rounded-2xl border border-border bg-card px-6 py-16 text-center"
+        >
+          <AlertTriangle className="h-10 w-10 text-destructive" />
+          <h2 className="mt-4 font-display text-xl font-bold text-foreground">
+            Unable to load studios right now
+          </h2>
+          <p className="mt-2 max-w-md text-sm text-muted-foreground">
+            Something went wrong while contacting the directory API.
+          </p>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => setReloadNonce((n) => n + 1)}
+            className="mt-6 gap-2"
+          >
+            <RotateCcw className="h-4 w-4" />
+            Retry
+          </Button>
         </div>
       ) : studios.length === 0 ? (
         <div className="mt-12 flex flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-card px-6 py-16 text-center">

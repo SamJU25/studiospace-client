@@ -16,6 +16,7 @@ import {
 import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
 import { uploadImageToImgbb } from "@/lib/imgbb";
+import { isSafeHttpUrl } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -69,13 +70,19 @@ export default function RegisterPage() {
       return;
     }
 
+    const trimmedPhoto = photoUrl.trim();
+    if (trimmedPhoto && !isSafeHttpUrl(trimmedPhoto)) {
+      toast.error("Photo URL must start with https:// or http://.");
+      return;
+    }
+
     setSubmitting(true);
     try {
       const { error } = await authClient.signUp.email({
         name: name.trim(),
         email: email.trim(),
         password,
-        image: photoUrl.trim() || undefined,
+        image: trimmedPhoto || undefined,
       });
 
       if (error) {
@@ -164,17 +171,18 @@ export default function RegisterPage() {
                 onChange={(e) => setPhotoUrl(e.target.value)}
                 placeholder="https://i.ibb.co/..."
               />
-              <label className="inline-flex shrink-0 cursor-pointer items-center justify-center rounded-lg border border-border bg-secondary px-3 text-xs font-medium text-foreground hover:bg-secondary/80">
+              <label className="relative inline-flex h-10 shrink-0 cursor-pointer items-center justify-center rounded-lg border border-border bg-secondary px-3 text-xs font-medium text-foreground hover:bg-secondary/80 focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:ring-offset-background">
                 {uploadingPhoto ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
                   <Upload className="h-4 w-4" />
                 )}
+                <span className="sr-only">Upload profile photo</span>
                 <input
                   type="file"
                   accept="image/*"
                   onChange={handlePhotoUpload}
-                  className="hidden"
+                  className="sr-only"
                 />
               </label>
             </div>
@@ -197,7 +205,7 @@ export default function RegisterPage() {
                 type="button"
                 onClick={() => setShowPassword((prev) => !prev)}
                 aria-label={showPassword ? "Hide password" : "Show password"}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground cursor-pointer"
+                className="absolute right-3 top-1/2 -translate-y-1/2 rounded p-0.5 text-muted-foreground hover:text-foreground cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
                 {showPassword ? (
                   <EyeOff className="h-4 w-4" />
@@ -210,7 +218,7 @@ export default function RegisterPage() {
             <div className="pt-2 space-y-1.5 text-xs">
               <p className="flex items-center gap-2">
                 {hasUppercase ? (
-                  <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
+                  <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
                 ) : (
                   <XCircle className="h-3.5 w-3.5 text-muted-foreground" />
                 )}
@@ -220,7 +228,7 @@ export default function RegisterPage() {
               </p>
               <p className="flex items-center gap-2">
                 {hasLowercase ? (
-                  <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
+                  <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
                 ) : (
                   <XCircle className="h-3.5 w-3.5 text-muted-foreground" />
                 )}
@@ -230,7 +238,7 @@ export default function RegisterPage() {
               </p>
               <p className="flex items-center gap-2">
                 {hasMinLength ? (
-                  <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
+                  <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
                 ) : (
                   <XCircle className="h-3.5 w-3.5 text-muted-foreground" />
                 )}

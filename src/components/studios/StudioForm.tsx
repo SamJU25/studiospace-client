@@ -275,25 +275,26 @@ export function StudioForm({ mode, initialStudio }: StudioFormProps) {
               onChange={(e) => setImageUrl(e.target.value)}
               placeholder="https://images.unsplash.com/..."
             />
-            <label className="inline-flex shrink-0 cursor-pointer items-center gap-2 rounded-lg border border-border bg-secondary px-3.5 text-sm font-medium text-foreground hover:bg-secondary/80">
+            <label className="relative inline-flex h-10 shrink-0 cursor-pointer items-center gap-2 rounded-lg border border-border bg-secondary px-3.5 text-sm font-medium text-foreground hover:bg-secondary/80 focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:ring-offset-background">
               {uploading ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
                 <Upload className="h-4 w-4" />
               )}
               <span className="hidden sm:inline">Upload</span>
+              <span className="sm:sr-only">Upload cover image</span>
               <input
                 type="file"
                 accept="image/*"
                 onChange={handleImageUpload}
-                className="hidden"
+                className="sr-only"
               />
             </label>
           </div>
-          {imageUrl && (
+          {imageUrl && isSafeHttpUrl(imageUrl.trim()) && (
             <div className="mt-3 overflow-hidden rounded-xl border border-border aspect-[16/9] max-h-56 w-full bg-muted">
               <img
-                src={imageUrl}
+                src={imageUrl.trim()}
                 alt="Studio cover preview"
                 className="h-full w-full object-cover"
               />

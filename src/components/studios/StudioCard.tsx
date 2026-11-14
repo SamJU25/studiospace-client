@@ -3,14 +3,14 @@
 import * as React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Heart, MapPin, Star, Users } from "lucide-react";
+import { Heart, ImageOff, MapPin, Star, Users } from "lucide-react";
 import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
 import { apiFetch } from "@/lib/api";
 import type { Studio } from "@/lib/types";
 import { cn, formatCurrency } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 
 interface StudioCardProps {
   studio: Studio;
@@ -27,8 +27,10 @@ export function StudioCard({
   const { data: session } = authClient.useSession();
   const [localSaved, setLocalSaved] = React.useState<boolean | null>(null);
   const [toggling, setToggling] = React.useState(false);
+  const [imgError, setImgError] = React.useState(false);
 
   const saved = onWishlistChange ? isSaved : (localSaved ?? isSaved);
+  const hasReviews = (studio.reviewCount ?? 0) > 0 && studio.rating > 0;
 
   const handleToggleWishlist = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -75,12 +77,19 @@ export function StudioCard({
       {/* Uniform 16:10 image */}
       <div className="relative aspect-[16/10] w-full overflow-hidden bg-muted">
         <Link href={`/studios/${studio._id}`} className="block h-full w-full">
-          <img
-            src={studio.imageUrl}
-            alt={studio.title}
-            loading="lazy"
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-          />
+          {imgError ? (
+            <div className="flex h-full w-full items-center justify-center text-muted-foreground">
+              <ImageOff className="h-8 w-8 opacity-50" />
+            </div>
+          ) : (
+            <img
+              src={studio.imageUrl}
+              alt={studio.title}
+              loading="lazy"
+              onError={() => setImgError(true)}
+              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+            />
+          )}
         </Link>
 
         <div className="absolute left-3.5 top-3.5">
@@ -95,7 +104,7 @@ export function StudioCard({
           disabled={toggling}
           aria-label={saved ? "Remove from saved studios" : "Save studio"}
           className={cn(
-            "absolute right-3 top-3 flex h-10 w-10 items-center justify-center rounded-full border backdrop-blur-sm transition-colors cursor-pointer",
+            "absolute right-3 top-3 flex h-10 w-10 items-center justify-center rounded-full border backdrop-blur-sm transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
             saved
               ? "border-primary bg-primary text-primary-foreground"
               : "border-white/30 bg-black/45 text-white hover:bg-black/65"
@@ -114,7 +123,7 @@ export function StudioCard({
           </span>
           <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-secondary px-2 py-0.5 font-semibold text-foreground tabular-nums">
             <Star className="h-3.5 w-3.5 fill-amber-500 text-amber-500" />
-            {Number(studio.rating || 5).toFixed(1)}
+            {hasReviews ? Number(studio.rating).toFixed(1) : "New"}
           </span>
         </div>
 
@@ -142,8 +151,11 @@ export function StudioCard({
               <span className="text-xs text-muted-foreground"> / hr</span>
             </div>
 
-            <Link href={`/studios/${studio._id}`}>
-              <Button size="sm">View Details</Button>
+            <Link
+              href={`/studios/${studio._id}`}
+              className={buttonVariants({ size: "sm" })}
+            >
+              View Details
             </Link>
           </div>
         </div>

@@ -12,7 +12,7 @@ import {
   CalendarClock,
 } from "lucide-react";
 import type { StudioCategory } from "@/lib/types";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 
 const CATEGORY_CARDS: {
   name: StudioCategory;
@@ -99,7 +99,7 @@ export function CategoriesAndTrustSections() {
             </p>
           </div>
 
-          <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
+          <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
             {CATEGORY_CARDS.map((cat) => {
               const Icon = cat.icon;
               return (
@@ -212,13 +212,14 @@ export function CategoriesAndTrustSections() {
               </ul>
 
               <div className="flex flex-wrap gap-3 pt-2">
-                <Link href="/add-studio">
-                  <Button size="lg">List Your Studio</Button>
+                <Link href="/add-studio" className={buttonVariants({ size: "lg" })}>
+                  List Your Studio
                 </Link>
-                <Link href="/studios">
-                  <Button size="lg" variant="outline">
-                    Browse All Spaces
-                  </Button>
+                <Link
+                  href="/studios"
+                  className={buttonVariants({ size: "lg", variant: "outline" })}
+                >
+                  Browse All Spaces
                 </Link>
               </div>
             </div>

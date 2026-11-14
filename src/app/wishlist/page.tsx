@@ -7,9 +7,10 @@ import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
 import { apiFetch } from "@/lib/api";
 import type { Studio } from "@/lib/types";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { StudioCardSkeleton } from "@/components/ui/skeleton";
 import { StudioCard } from "@/components/studios/StudioCard";
+import { cn } from "@/lib/utils";
 
 export default function WishlistPage() {
   const { data: session, isPending } = authClient.useSession();
@@ -57,11 +58,12 @@ export default function WishlistPage() {
           </p>
         </div>
 
-        <Link href="/studios">
-          <Button variant="outline" className="gap-2">
-            <Compass className="h-4 w-4" />
-            Explore More
-          </Button>
+        <Link
+          href="/studios"
+          className={cn(buttonVariants({ variant: "outline" }), "gap-2")}
+        >
+          <Compass className="h-4 w-4" />
+          Explore More
         </Link>
       </div>
 
@@ -83,8 +85,8 @@ export default function WishlistPage() {
             Tap the heart icon on any studio card to keep track of spaces you
             want to book later.
           </p>
-          <Link href="/studios" className="mt-6">
-            <Button>Browse Studios</Button>
+          <Link href="/studios" className={cn(buttonVariants(), "mt-6")}>
+            Browse Studios
           </Link>
         </div>
       ) : (

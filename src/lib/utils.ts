@@ -20,13 +20,22 @@ export function sanitizeCallbackUrl(raw: string | null | undefined): string {
   if (!raw) return "/";
   const trimmed = raw.trim();
   if (
+    /[\u0000-\u001f\u007f]/.test(trimmed) ||
     !trimmed.startsWith("/") ||
     trimmed.startsWith("//") ||
     trimmed.startsWith("/\\")
   ) {
     return "/";
   }
-  return trimmed;
+  try {
+    const parsed = new URL(trimmed, "https://example.invalid");
+    if (parsed.origin !== "https://example.invalid") {
+      return "/";
+    }
+    return `${parsed.pathname}${parsed.search}${parsed.hash}`;
+  } catch {
+    return "/";
+  }
 }
 
 export function isSafeHttpUrl(value: string): boolean {

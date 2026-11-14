@@ -18,7 +18,7 @@ import { apiFetch } from "@/lib/api";
 import type { Studio } from "@/lib/types";
 import { formatCurrency } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Modal } from "@/components/ui/modal";
 import { StudioCardSkeleton } from "@/components/ui/skeleton";
 
@@ -31,6 +31,10 @@ export default function MyListingsPage() {
     null
   );
   const [deleting, setDeleting] = React.useState(false);
+  const [reloadNonce, setReloadNonce] = React.useState(0);
+  const [fetchError, setFetchError] = React.useState("");
+
+  const requestKey = userId ? `${userId}:${reloadNonce}` : "";
 
   React.useEffect(() => {
     if (isPending || !userId) return;
@@ -40,25 +44,31 @@ export default function MyListingsPage() {
       requireAuth: true,
     })
       .then((res) => {
-        if (active) setStudios(res.studios || []);
+        if (!active) return;
+        setFetchError("");
+        setStudios(res.studios || []);
       })
       .catch((err) => {
         if (active) {
-          toast.error(
-            err instanceof Error ? err.message : "Failed to load your listings."
-          );
+          const message =
+            err instanceof Error
+              ? err.message
+              : "Failed to load your listings.";
+          setFetchError(message);
+          toast.error(message);
         }
       })
       .finally(() => {
-        if (active) setFetchedForUser(userId);
+        if (active) setFetchedForUser(requestKey);
       });
 
     return () => {
       active = false;
     };
-  }, [isPending, userId]);
+  }, [isPending, userId, requestKey]);
 
-  const loading = isPending || (Boolean(userId) && fetchedForUser !== userId);
+  const loading =
+    isPending || (Boolean(userId) && fetchedForUser !== requestKey);
 
   const handleConfirmDelete = async () => {
     if (!studioToDelete) return;
@@ -95,11 +105,9 @@ export default function MyListingsPage() {
           </p>
         </div>
 
-        <Link href="/add-studio">
-          <Button className="gap-2">
-            <PlusSquare className="h-4 w-4" />
-            Add New Studio
-          </Button>
+        <Link href="/add-studio" className={buttonVariants({ className: "gap-2" })}>
+          <PlusSquare className="h-4 w-4" />
+          Add New Studio
         </Link>
       </div>
 
@@ -108,6 +116,25 @@ export default function MyListingsPage() {
           {Array.from({ length: 3 }).map((_, i) => (
             <StudioCardSkeleton key={i} />
           ))}
+        </div>
+      ) : fetchError ? (
+        <div className="mt-12 flex flex-col items-center justify-center rounded-2xl border border-border bg-card px-6 py-14 text-center">
+          <h2 className="font-display text-xl font-bold text-foreground">
+            Unable to load your listings
+          </h2>
+          <p className="mt-2 max-w-md text-sm text-muted-foreground">
+            {fetchError}
+          </p>
+          <Button
+            type="button"
+            className="mt-6"
+            onClick={() => {
+              setFetchError("");
+              setReloadNonce((n) => n + 1);
+            }}
+          >
+            Try again
+          </Button>
         </div>
       ) : studios.length === 0 ? (
         <div className="mt-12 flex flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-card px-6 py-16 text-center">
@@ -121,8 +148,8 @@ export default function MyListingsPage() {
             Turn idle studio hours into recurring income by publishing your
             workspace on StudioSpace.
           </p>
-          <Link href="/add-studio" className="mt-6">
-            <Button>Publish Your First Studio</Button>
+          <Link href="/add-studio" className={buttonVariants({ className: "mt-6" })}>
+            Publish Your First Studio
           </Link>
         </div>
       ) : (
@@ -153,30 +180,40 @@ export default function MyListingsPage() {
                   </span>
                   <span className="inline-flex items-center gap-1 shrink-0">
                     <Users className="h-3.5 w-3.5" />
-                    {studio.maxCapacity}
+                    {studio.maxCapacity} crew
                   </span>
                 </div>
 
-                <h3 className="mt-2.5 font-display text-lg font-bold text-foreground line-clamp-2">
+                <h2 className="mt-2.5 font-display text-lg font-bold text-foreground line-clamp-2">
                   {studio.title}
-                </h3>
+                </h2>
 
                 <p className="mt-1.5 text-sm font-semibold text-primary tabular-nums">
                   {formatCurrency(studio.hourlyRate)} / hr
                 </p>
 
                 <div className="mt-auto flex items-center gap-2 border-t border-border pt-4">
-                  <Link href={`/studios/${studio._id}`} className="flex-1">
-                    <Button variant="outline" size="sm" className="w-full gap-1.5">
-                      <ExternalLink className="h-3.5 w-3.5" />
-                      View
-                    </Button>
+                  <Link
+                    href={`/studios/${studio._id}`}
+                    className={buttonVariants({
+                      variant: "outline",
+                      size: "sm",
+                      className: "flex-1 gap-1.5",
+                    })}
+                  >
+                    <ExternalLink className="h-3.5 w-3.5" />
+                    View
                   </Link>
-                  <Link href={`/studios/edit/${studio._id}`} className="flex-1">
-                    <Button variant="secondary" size="sm" className="w-full gap-1.5">
-                      <Edit3 className="h-3.5 w-3.5" />
-                      Update
-                    </Button>
+                  <Link
+                    href={`/studios/edit/${studio._id}`}
+                    className={buttonVariants({
+                      variant: "secondary",
+                      size: "sm",
+                      className: "flex-1 gap-1.5",
+                    })}
+                  >
+                    <Edit3 className="h-3.5 w-3.5" />
+                    Update
                   </Link>
                   <Button
                     type="button"

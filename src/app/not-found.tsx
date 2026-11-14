@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Aperture, ArrowLeft, Compass } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 export default function NotFoundPage() {
   return (
@@ -21,17 +22,16 @@ export default function NotFoundPage() {
       </p>
 
       <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-        <Link href="/">
-          <Button size="lg" className="gap-2">
-            <ArrowLeft className="h-4 w-4" />
-            Return to Home
-          </Button>
+        <Link href="/" className={cn(buttonVariants({ size: "lg" }), "gap-2")}>
+          <ArrowLeft className="h-4 w-4" />
+          Return to Home
         </Link>
-        <Link href="/studios">
-          <Button size="lg" variant="outline" className="gap-2">
-            <Compass className="h-4 w-4" />
-            Explore Studios
-          </Button>
+        <Link
+          href="/studios"
+          className={cn(buttonVariants({ size: "lg", variant: "outline" }), "gap-2")}
+        >
+          <Compass className="h-4 w-4" />
+          Explore Studios
         </Link>
       </div>
     </div>

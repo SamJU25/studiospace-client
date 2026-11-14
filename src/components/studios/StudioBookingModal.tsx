@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { AlertTriangle, Calendar, Loader2 } from "lucide-react";
+import { AlertTriangle, Loader2 } from "lucide-react";
 import type { Studio } from "@/lib/types";
 import { formatCurrency } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -27,6 +27,14 @@ interface StudioBookingModalProps {
   bookingError: string;
   bookingSubmitting: boolean;
   onSubmit: (e: React.FormEvent) => void;
+}
+
+function getLocalDateIso(): string {
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2, "0");
+  const d = String(now.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
 }
 
 export function StudioBookingModal({
@@ -67,18 +75,14 @@ export function StudioBookingModal({
 
         <div className="space-y-1.5">
           <Label htmlFor="booking-date">Session Date</Label>
-          <div className="relative">
-            <Calendar className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              id="booking-date"
-              type="date"
-              required
-              min={new Date().toISOString().split("T")[0]}
-              value={bookingDate}
-              onChange={(e) => onBookingDateChange(e.target.value)}
-              className="pl-10"
-            />
-          </div>
+          <Input
+            id="booking-date"
+            type="date"
+            required
+            min={getLocalDateIso()}
+            value={bookingDate}
+            onChange={(e) => onBookingDateChange(e.target.value)}
+          />
         </div>
 
         <div className="grid grid-cols-2 gap-3">
@@ -121,7 +125,7 @@ export function StudioBookingModal({
               {formatCurrency(studio.hourlyRate)} × {hours} hr(s)
             </span>
             <span className="font-semibold text-foreground">
-              ${estimatedTotal.toFixed(2)}
+              {formatCurrency(estimatedTotal)}
             </span>
           </div>
           <div className="flex justify-between text-muted-foreground">
