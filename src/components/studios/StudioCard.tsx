@@ -25,12 +25,10 @@ export function StudioCard({
 }: StudioCardProps) {
   const router = useRouter();
   const { data: session } = authClient.useSession();
-  const [saved, setSaved] = React.useState(isSaved);
+  const [localSaved, setLocalSaved] = React.useState<boolean | null>(null);
   const [toggling, setToggling] = React.useState(false);
 
-  React.useEffect(() => {
-    setSaved(isSaved);
-  }, [isSaved]);
+  const saved = onWishlistChange ? isSaved : (localSaved ?? isSaved);
 
   const handleToggleWishlist = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -53,8 +51,11 @@ export function StudioCard({
           body: JSON.stringify({ studioId: studio._id }),
         }
       );
-      setSaved(res.saved);
-      onWishlistChange?.(studio._id, res.saved);
+      if (onWishlistChange) {
+        onWishlistChange(studio._id, res.saved);
+      } else {
+        setLocalSaved(res.saved);
+      }
       toast.success(
         res.saved
           ? "Saved studio to your wishlist."

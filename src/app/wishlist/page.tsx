@@ -13,26 +13,37 @@ import { StudioCard } from "@/components/studios/StudioCard";
 
 export default function WishlistPage() {
   const { data: session, isPending } = authClient.useSession();
+  const userId = session?.user?.id;
   const [studios, setStudios] = React.useState<Studio[]>([]);
-  const [loading, setLoading] = React.useState(true);
+  const [fetchedForUser, setFetchedForUser] = React.useState<string>("");
 
   React.useEffect(() => {
-    if (isPending) return;
-    if (!session?.user) {
-      setLoading(false);
-      return;
-    }
+    if (isPending || !userId) return;
 
-    setLoading(true);
+    let active = true;
     apiFetch<{ studios: Studio[] }>("/api/wishlist", { requireAuth: true })
-      .then((res) => setStudios(res.studios || []))
-      .catch((err) => {
-        toast.error(
-          err instanceof Error ? err.message : "Failed to load saved studios."
-        );
+      .then((res) => {
+        if (active) setStudios(res.studios || []);
       })
-      .finally(() => setLoading(false));
-  }, [isPending, session?.user?.id]);
+      .catch((err) => {
+        if (active) {
+          toast.error(
+            err instanceof Error
+              ? err.message
+              : "Failed to load saved studios."
+          );
+        }
+      })
+      .finally(() => {
+        if (active) setFetchedForUser(userId);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [isPending, userId]);
+
+  const loading = isPending || (Boolean(userId) && fetchedForUser !== userId);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">

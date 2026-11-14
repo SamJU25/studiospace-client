@@ -13,11 +13,12 @@ import { StudioForm } from "@/components/studios/StudioForm";
 export default function EditStudioPage() {
   const { id } = useParams<{ id: string }>();
   const [studio, setStudio] = React.useState<Studio | null>(null);
-  const [loading, setLoading] = React.useState(true);
+  const [loadedId, setLoadedId] = React.useState<string>("");
+
+  const loading = loadedId !== id;
 
   React.useEffect(() => {
     let active = true;
-    setLoading(true);
     apiFetch<{ studio: Studio }>(`/api/studios/${id}`)
       .then((res) => {
         if (active) setStudio(res.studio);
@@ -26,7 +27,7 @@ export default function EditStudioPage() {
         if (active) setStudio(null);
       })
       .finally(() => {
-        if (active) setLoading(false);
+        if (active) setLoadedId(id);
       });
 
     return () => {

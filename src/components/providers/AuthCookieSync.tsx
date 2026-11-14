@@ -6,12 +6,13 @@ import { syncServerCookie } from "@/lib/api";
 
 export function AuthCookieSync() {
   const { data: session } = authClient.useSession();
+  const userId = session?.user?.id;
 
   useEffect(() => {
-    if (session?.user) {
+    if (userId) {
       syncServerCookie();
     }
-  }, [session?.user?.id]);
+  }, [userId]);
 
   return null;
 }

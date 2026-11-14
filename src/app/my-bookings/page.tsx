@@ -38,44 +38,50 @@ function getStatusBadgeVariant(status: BookingStatus) {
 
 export default function MyBookingsPage() {
   const { data: session, isPending } = authClient.useSession();
+  const userId = session?.user?.id;
   const [activeTab, setActiveTab] = React.useState<"guest" | "host">("guest");
   const [myBookings, setMyBookings] = React.useState<Booking[]>([]);
   const [hostBookings, setHostBookings] = React.useState<Booking[]>([]);
-  const [loading, setLoading] = React.useState(true);
+  const [fetchedForUser, setFetchedForUser] = React.useState<string>("");
   const [bookingToCancel, setBookingToCancel] = React.useState<Booking | null>(
     null
   );
   const [processingId, setProcessingId] = React.useState<string | null>(null);
 
-  const loadBookings = React.useCallback(async () => {
-    setLoading(true);
-    try {
-      const [guestRes, hostRes] = await Promise.all([
-        apiFetch<{ bookings: Booking[] }>("/api/bookings/my", {
-          requireAuth: true,
-        }),
-        apiFetch<{ bookings: Booking[] }>("/api/bookings/host", {
-          requireAuth: true,
-        }),
-      ]);
-      setMyBookings(guestRes.bookings || []);
-      setHostBookings(hostRes.bookings || []);
-    } catch (err) {
-      toast.error(
-        err instanceof Error ? err.message : "Failed to load bookings."
-      );
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
   React.useEffect(() => {
-    if (!isPending && session?.user) {
-      loadBookings();
-    } else if (!isPending && !session?.user) {
-      setLoading(false);
-    }
-  }, [isPending, session?.user?.id, loadBookings]);
+    if (isPending || !userId) return;
+
+    let active = true;
+    Promise.all([
+      apiFetch<{ bookings: Booking[] }>("/api/bookings/my", {
+        requireAuth: true,
+      }),
+      apiFetch<{ bookings: Booking[] }>("/api/bookings/host", {
+        requireAuth: true,
+      }),
+    ])
+      .then(([guestRes, hostRes]) => {
+        if (!active) return;
+        setMyBookings(guestRes.bookings || []);
+        setHostBookings(hostRes.bookings || []);
+      })
+      .catch((err) => {
+        if (active) {
+          toast.error(
+            err instanceof Error ? err.message : "Failed to load bookings."
+          );
+        }
+      })
+      .finally(() => {
+        if (active) setFetchedForUser(userId);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [isPending, userId]);
+
+  const loading = isPending || (Boolean(userId) && fetchedForUser !== userId);
 
   const handleConfirmCancelBooking = async () => {
     if (!bookingToCancel) return;

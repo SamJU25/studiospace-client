@@ -39,11 +39,6 @@ export function Navbar() {
   const dropdownRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
-    setDropdownOpen(false);
-    setMobileOpen(false);
-  }, [pathname]);
-
-  React.useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (
         dropdownRef.current &&
@@ -55,6 +50,11 @@ export function Navbar() {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  const closeMenus = () => {
+    setDropdownOpen(false);
+    setMobileOpen(false);
+  };
 
   const handleLogout = async () => {
     try {
@@ -164,6 +164,7 @@ export function Navbar() {
 
                     <Link
                       href="/dashboard"
+                      onClick={closeMenus}
                       className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-foreground hover:bg-secondary transition-colors"
                     >
                       <LayoutDashboard className="h-4 w-4 text-muted-foreground" />
@@ -171,6 +172,7 @@ export function Navbar() {
                     </Link>
                     <Link
                       href="/add-studio"
+                      onClick={closeMenus}
                       className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-foreground hover:bg-secondary transition-colors"
                     >
                       <PlusSquare className="h-4 w-4 text-muted-foreground" />
@@ -178,6 +180,7 @@ export function Navbar() {
                     </Link>
                     <Link
                       href="/my-listings"
+                      onClick={closeMenus}
                       className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-foreground hover:bg-secondary transition-colors"
                     >
                       <ListMusic className="h-4 w-4 text-muted-foreground" />
@@ -185,6 +188,7 @@ export function Navbar() {
                     </Link>
                     <Link
                       href="/my-bookings"
+                      onClick={closeMenus}
                       className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-foreground hover:bg-secondary transition-colors"
                     >
                       <CalendarCheck className="h-4 w-4 text-muted-foreground" />
@@ -192,6 +196,7 @@ export function Navbar() {
                     </Link>
                     <Link
                       href="/wishlist"
+                      onClick={closeMenus}
                       className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-foreground hover:bg-secondary transition-colors"
                     >
                       <Heart className="h-4 w-4 text-muted-foreground" />
@@ -252,6 +257,7 @@ export function Navbar() {
               <Link
                 key={item.href}
                 href={item.href}
+                onClick={closeMenus}
                 className={cn(
                   "block rounded-lg px-3 py-2.5 text-sm font-medium",
                   isActive
@@ -270,19 +276,19 @@ export function Navbar() {
                 <div className="px-3 py-1.5 text-xs text-muted-foreground">
                   Signed in as <strong className="text-foreground">{user.name || user.email}</strong>
                 </div>
-                <Link href="/dashboard" className="block rounded-lg px-3 py-2 text-sm hover:bg-secondary">
+                <Link href="/dashboard" onClick={closeMenus} className="block rounded-lg px-3 py-2 text-sm hover:bg-secondary">
                   Dashboard
                 </Link>
-                <Link href="/add-studio" className="block rounded-lg px-3 py-2 text-sm hover:bg-secondary">
+                <Link href="/add-studio" onClick={closeMenus} className="block rounded-lg px-3 py-2 text-sm hover:bg-secondary">
                   Add New Studio
                 </Link>
-                <Link href="/my-listings" className="block rounded-lg px-3 py-2 text-sm hover:bg-secondary">
+                <Link href="/my-listings" onClick={closeMenus} className="block rounded-lg px-3 py-2 text-sm hover:bg-secondary">
                   My Studio Listings
                 </Link>
-                <Link href="/my-bookings" className="block rounded-lg px-3 py-2 text-sm hover:bg-secondary">
+                <Link href="/my-bookings" onClick={closeMenus} className="block rounded-lg px-3 py-2 text-sm hover:bg-secondary">
                   My Bookings
                 </Link>
-                <Link href="/wishlist" className="block rounded-lg px-3 py-2 text-sm hover:bg-secondary">
+                <Link href="/wishlist" onClick={closeMenus} className="block rounded-lg px-3 py-2 text-sm hover:bg-secondary">
                   Saved Studios
                 </Link>
                 <button

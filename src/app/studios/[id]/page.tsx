@@ -47,14 +47,17 @@ export default function StudioDetailsPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const { data: session } = authClient.useSession();
+  const userId = session?.user?.id;
 
   const [studio, setStudio] = React.useState<Studio | null>(null);
   const [reviews, setReviews] = React.useState<Review[]>([]);
   const [confirmedSlots, setConfirmedSlots] = React.useState<ConfirmedSlot[]>(
     []
   );
-  const [loading, setLoading] = React.useState(true);
+  const [loadedId, setLoadedId] = React.useState<string>("");
   const [isSaved, setIsSaved] = React.useState(false);
+
+  const loading = loadedId !== id;
 
   // Booking Modal State
   const [bookingModalOpen, setBookingModalOpen] = React.useState(false);
@@ -75,7 +78,6 @@ export default function StudioDetailsPage() {
 
   React.useEffect(() => {
     let active = true;
-    setLoading(true);
     apiFetch<{
       studio: Studio;
       reviews: Review[];
@@ -91,7 +93,7 @@ export default function StudioDetailsPage() {
         if (active) setStudio(null);
       })
       .finally(() => {
-        if (active) setLoading(false);
+        if (active) setLoadedId(id);
       });
 
     return () => {
@@ -100,11 +102,17 @@ export default function StudioDetailsPage() {
   }, [id]);
 
   React.useEffect(() => {
-    if (!session?.user || !id) return;
+    if (!userId || !id) return;
+    let active = true;
     apiFetch<{ studioIds: string[] }>("/api/wishlist", { requireAuth: true })
-      .then((res) => setIsSaved((res.studioIds || []).includes(id)))
+      .then((res) => {
+        if (active) setIsSaved((res.studioIds || []).includes(id));
+      })
       .catch(() => {});
-  }, [session?.user?.id, id]);
+    return () => {
+      active = false;
+    };
+  }, [userId, id]);
 
   const handleToggleWishlist = async () => {
     if (!session?.user) {

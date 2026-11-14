@@ -18,25 +18,20 @@ export function FeaturedStudiosSection({
   initialStudios,
 }: FeaturedStudiosSectionProps) {
   const { data: session } = authClient.useSession();
+  const userId = session?.user?.id;
   const [studios, setStudios] = React.useState<Studio[]>(initialStudios);
   const [savedIds, setSavedIds] = React.useState<Set<string>>(new Set());
   const [loading, setLoading] = React.useState(initialStudios.length === 0);
 
   React.useEffect(() => {
-    let active = true;
-    if (initialStudios.length > 0) {
-      setStudios(initialStudios);
-      setLoading(false);
-      return;
-    }
+    if (initialStudios.length > 0) return;
 
+    let active = true;
     apiFetch<{ studios: Studio[] }>("/api/studios/featured")
       .then((res) => {
         if (active) setStudios(res.studios || []);
       })
-      .catch(() => {
-        // Keep empty state cleanly
-      })
+      .catch(() => {})
       .finally(() => {
         if (active) setLoading(false);
       });
@@ -44,18 +39,24 @@ export function FeaturedStudiosSection({
     return () => {
       active = false;
     };
-  }, [initialStudios]);
+  }, [initialStudios.length]);
 
   React.useEffect(() => {
-    if (!session?.user) {
-      setSavedIds(new Set());
-      return;
-    }
+    if (!userId) return;
 
+    let active = true;
     apiFetch<{ studioIds: string[] }>("/api/wishlist", { requireAuth: true })
-      .then((res) => setSavedIds(new Set(res.studioIds || [])))
+      .then((res) => {
+        if (active) setSavedIds(new Set(res.studioIds || []));
+      })
       .catch(() => {});
-  }, [session?.user?.id]);
+
+    return () => {
+      active = false;
+    };
+  }, [userId]);
+
+  const effectiveSavedIds = userId ? savedIds : new Set<string>();
 
   return (
     <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
@@ -106,7 +107,7 @@ export function FeaturedStudiosSection({
             <StudioCard
               key={studio._id}
               studio={studio}
-              isSaved={savedIds.has(studio._id)}
+              isSaved={effectiveSavedIds.has(studio._id)}
               onWishlistChange={(id, saved) => {
                 setSavedIds((prev) => {
                   const next = new Set(prev);

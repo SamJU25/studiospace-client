@@ -24,37 +24,41 @@ import { StudioCardSkeleton } from "@/components/ui/skeleton";
 
 export default function MyListingsPage() {
   const { data: session, isPending } = authClient.useSession();
+  const userId = session?.user?.id;
   const [studios, setStudios] = React.useState<Studio[]>([]);
-  const [loading, setLoading] = React.useState(true);
+  const [fetchedForUser, setFetchedForUser] = React.useState<string>("");
   const [studioToDelete, setStudioToDelete] = React.useState<Studio | null>(
     null
   );
   const [deleting, setDeleting] = React.useState(false);
 
-  const loadListings = React.useCallback(async () => {
-    setLoading(true);
-    try {
-      const res = await apiFetch<{ studios: Studio[] }>(
-        "/api/studios/my-listings",
-        { requireAuth: true }
-      );
-      setStudios(res.studios || []);
-    } catch (err) {
-      toast.error(
-        err instanceof Error ? err.message : "Failed to load your listings."
-      );
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
   React.useEffect(() => {
-    if (!isPending && session?.user) {
-      loadListings();
-    } else if (!isPending && !session?.user) {
-      setLoading(false);
-    }
-  }, [isPending, session?.user?.id, loadListings]);
+    if (isPending || !userId) return;
+
+    let active = true;
+    apiFetch<{ studios: Studio[] }>("/api/studios/my-listings", {
+      requireAuth: true,
+    })
+      .then((res) => {
+        if (active) setStudios(res.studios || []);
+      })
+      .catch((err) => {
+        if (active) {
+          toast.error(
+            err instanceof Error ? err.message : "Failed to load your listings."
+          );
+        }
+      })
+      .finally(() => {
+        if (active) setFetchedForUser(userId);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [isPending, userId]);
+
+  const loading = isPending || (Boolean(userId) && fetchedForUser !== userId);
 
   const handleConfirmDelete = async () => {
     if (!studioToDelete) return;

@@ -16,20 +16,16 @@ import { StudioCard } from "@/components/studios/StudioCard";
 function ExploreStudiosContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const initialCategory = searchParams.get("category") || "All";
+  const selectedCategory = searchParams.get("category") || "All";
 
   const { data: session } = authClient.useSession();
-  const [selectedCategory, setSelectedCategory] = React.useState(initialCategory);
+  const userId = session?.user?.id;
   const [searchInput, setSearchInput] = React.useState("");
   const [debouncedSearch, setDebouncedSearch] = React.useState("");
   const [sortBy, setSortBy] = React.useState("newest");
   const [studios, setStudios] = React.useState<Studio[]>([]);
   const [savedIds, setSavedIds] = React.useState<Set<string>>(new Set());
-  const [loading, setLoading] = React.useState(true);
-
-  React.useEffect(() => {
-    setSelectedCategory(searchParams.get("category") || "All");
-  }, [searchParams]);
+  const [fetchedKey, setFetchedKey] = React.useState<string>("");
 
   React.useEffect(() => {
     const timer = setTimeout(() => {
@@ -38,10 +34,7 @@ function ExploreStudiosContent() {
     return () => clearTimeout(timer);
   }, [searchInput]);
 
-  React.useEffect(() => {
-    let active = true;
-    setLoading(true);
-
+  const queryParamsString = React.useMemo(() => {
     const params = new URLSearchParams();
     if (selectedCategory && selectedCategory !== "All") {
       params.set("category", selectedCategory);
@@ -52,8 +45,19 @@ function ExploreStudiosContent() {
     if (sortBy && sortBy !== "newest") {
       params.set("sort", sortBy);
     }
+    return params.toString();
+  }, [selectedCategory, debouncedSearch, sortBy]);
 
-    apiFetch<{ studios: Studio[] }>(`/api/studios?${params.toString()}`)
+  const requestKey = `${selectedCategory}|${debouncedSearch}|${sortBy}`;
+  const loading = fetchedKey !== requestKey;
+
+  React.useEffect(() => {
+    let active = true;
+    const url = queryParamsString
+      ? `/api/studios?${queryParamsString}`
+      : "/api/studios";
+
+    apiFetch<{ studios: Studio[] }>(url)
       .then((res) => {
         if (active) setStudios(res.studios || []);
       })
@@ -61,27 +65,32 @@ function ExploreStudiosContent() {
         if (active) setStudios([]);
       })
       .finally(() => {
-        if (active) setLoading(false);
+        if (active) setFetchedKey(requestKey);
       });
 
     return () => {
       active = false;
     };
-  }, [selectedCategory, debouncedSearch, sortBy]);
+  }, [queryParamsString, requestKey]);
 
   React.useEffect(() => {
-    if (!session?.user) {
-      setSavedIds(new Set());
-      return;
-    }
+    if (!userId) return;
 
+    let active = true;
     apiFetch<{ studioIds: string[] }>("/api/wishlist", { requireAuth: true })
-      .then((res) => setSavedIds(new Set(res.studioIds || [])))
+      .then((res) => {
+        if (active) setSavedIds(new Set(res.studioIds || []));
+      })
       .catch(() => {});
-  }, [session?.user?.id]);
+
+    return () => {
+      active = false;
+    };
+  }, [userId]);
+
+  const effectiveSavedIds = userId ? savedIds : new Set<string>();
 
   const handleCategorySelect = (category: string) => {
-    setSelectedCategory(category);
     const params = new URLSearchParams(searchParams.toString());
     if (category === "All") params.delete("category");
     else params.set("category", category);
@@ -212,7 +221,7 @@ function ExploreStudiosContent() {
               <StudioCard
                 key={studio._id}
                 studio={studio}
-                isSaved={savedIds.has(studio._id)}
+                isSaved={effectiveSavedIds.has(studio._id)}
                 onWishlistChange={(id, saved) => {
                   setSavedIds((prev) => {
                     const next = new Set(prev);

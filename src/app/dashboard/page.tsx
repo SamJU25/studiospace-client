@@ -18,22 +18,19 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export default function DashboardPage() {
   const { data: session, isPending } = authClient.useSession();
+  const userId = session?.user?.id;
   const [counts, setCounts] = React.useState({
     listings: 0,
     myBookings: 0,
     hostRequests: 0,
     saved: 0,
   });
-  const [loading, setLoading] = React.useState(true);
+  const [fetchedForUser, setFetchedForUser] = React.useState<string>("");
 
   React.useEffect(() => {
-    if (isPending) return;
-    if (!session?.user) {
-      setLoading(false);
-      return;
-    }
+    if (isPending || !userId) return;
 
-    setLoading(true);
+    let active = true;
     Promise.all([
       apiFetch<{ studios: Studio[] }>("/api/studios/my-listings", {
         requireAuth: true,
@@ -49,6 +46,7 @@ export default function DashboardPage() {
       }).catch(() => ({ studioIds: [] })),
     ])
       .then(([listingsRes, myBookingsRes, hostBookingsRes, wishlistRes]) => {
+        if (!active) return;
         setCounts({
           listings: listingsRes.studios?.length || 0,
           myBookings: myBookingsRes.bookings?.length || 0,
@@ -56,8 +54,16 @@ export default function DashboardPage() {
           saved: wishlistRes.studioIds?.length || 0,
         });
       })
-      .finally(() => setLoading(false));
-  }, [isPending, session?.user?.id]);
+      .finally(() => {
+        if (active) setFetchedForUser(userId);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [isPending, userId]);
+
+  const loading = isPending || (Boolean(userId) && fetchedForUser !== userId);
 
   const user = session?.user;
 
