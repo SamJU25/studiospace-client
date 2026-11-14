@@ -30,13 +30,99 @@ const NAV_LINKS = [
   { label: "About Us", href: "/#about-us" },
 ];
 
+const HOME_SECTION_IDS = ["how-it-works", "about-us"] as const;
+
+function getTrackedHash(hash: string): string {
+  return HOME_SECTION_IDS.some((id) => `#${id}` === hash) ? hash : "";
+}
+
+function isNavItemActive(
+  href: string,
+  pathname: string,
+  activeSection: string
+): boolean {
+  if (href === "/") {
+    return pathname === "/" && activeSection === "";
+  }
+  if (href.startsWith("/#")) {
+    return pathname === "/" && activeSection === href.slice(1);
+  }
+  return pathname.startsWith(href);
+}
+
 export function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
   const { data: session, isPending } = authClient.useSession();
   const [dropdownOpen, setDropdownOpen] = React.useState(false);
   const [mobileOpen, setMobileOpen] = React.useState(false);
+  const [activeSection, setActiveSection] = React.useState("");
   const dropdownRef = React.useRef<HTMLDivElement>(null);
+  const scrollLockRef = React.useRef(false);
+  const scrollLockTimerRef = React.useRef<number | null>(null);
+
+  const effectiveSection = pathname === "/" ? activeSection : "";
+
+  React.useEffect(() => {
+    if (pathname !== "/") return;
+
+    const syncFromHash = () => {
+      setActiveSection(getTrackedHash(window.location.hash));
+    };
+
+    const rafId = window.requestAnimationFrame(syncFromHash);
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (scrollLockRef.current) return;
+        const visible = entries.find((entry) => entry.isIntersecting);
+        if (visible?.target.id) {
+          setActiveSection(`#${visible.target.id}`);
+        }
+      },
+      { rootMargin: "-80px 0px -55% 0px", threshold: 0.05 }
+    );
+
+    for (const id of HOME_SECTION_IDS) {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    }
+
+    const handleScroll = () => {
+      if (scrollLockRef.current) return;
+      if (window.scrollY < 200) {
+        setActiveSection("");
+      }
+    };
+
+    window.addEventListener("hashchange", syncFromHash);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => {
+      window.cancelAnimationFrame(rafId);
+      if (scrollLockTimerRef.current !== null) {
+        window.clearTimeout(scrollLockTimerRef.current);
+      }
+      observer.disconnect();
+      window.removeEventListener("hashchange", syncFromHash);
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [pathname]);
+
+  const handleNavClick = (href: string) => {
+    closeMenus();
+    if (href === "/" || href.startsWith("/#")) {
+      scrollLockRef.current = true;
+      if (scrollLockTimerRef.current !== null) {
+        window.clearTimeout(scrollLockTimerRef.current);
+      }
+      scrollLockTimerRef.current = window.setTimeout(() => {
+        scrollLockRef.current = false;
+      }, 750);
+      setActiveSection(href.startsWith("/#") ? href.slice(1) : "");
+    } else {
+      setActiveSection("");
+    }
+  };
 
   React.useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -86,6 +172,7 @@ export function Navbar() {
         {/* Brand */}
         <Link
           href="/"
+          onClick={() => handleNavClick("/")}
           className="flex items-center gap-2.5 group focus-visible:outline-none"
         >
           <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm transition-transform group-hover:scale-105">
@@ -99,15 +186,17 @@ export function Navbar() {
         {/* Desktop Nav */}
         <nav className="hidden md:flex items-center gap-1">
           {NAV_LINKS.map((item) => {
-            const isActive =
-              item.href === "/"
-                ? pathname === "/"
-                : !item.href.includes("#") && pathname.startsWith(item.href);
+            const isActive = isNavItemActive(
+              item.href,
+              pathname,
+              effectiveSection
+            );
 
             return (
               <Link
                 key={item.href}
                 href={item.href}
+                onClick={() => handleNavClick(item.href)}
                 aria-current={isActive ? "page" : undefined}
                 className={cn(
                   "rounded-lg px-3.5 py-2 text-sm font-medium transition-colors",
@@ -257,15 +346,17 @@ export function Navbar() {
       {mobileOpen && (
         <div className="md:hidden border-t border-border bg-card px-4 py-4 space-y-2">
           {NAV_LINKS.map((item) => {
-            const isActive =
-              item.href === "/"
-                ? pathname === "/"
-                : !item.href.includes("#") && pathname.startsWith(item.href);
+            const isActive = isNavItemActive(
+              item.href,
+              pathname,
+              effectiveSection
+            );
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                onClick={closeMenus}
+                onClick={() => handleNavClick(item.href)}
+                aria-current={isActive ? "page" : undefined}
                 className={cn(
                   "block rounded-lg px-3 py-2.5 text-sm font-medium",
                   isActive

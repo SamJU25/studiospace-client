@@ -143,7 +143,7 @@ export function CategoriesAndTrustSections() {
       {/* Extra Section 1: How Booking Works — Hairline Bento Flow */}
       <section
         id="how-it-works"
-        className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8"
+        className="mx-auto max-w-7xl scroll-mt-16 px-4 py-16 sm:px-6 lg:px-8"
       >
         <div className="max-w-2xl">
           <h2 className="font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
@@ -182,7 +182,7 @@ export function CategoriesAndTrustSections() {
       {/* Extra Section 2: Host Guarantee & Creator Support */}
       <section
         id="about-us"
-        className="border-t border-border bg-secondary/45"
+        className="scroll-mt-16 border-t border-border bg-secondary/45"
       >
         <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 items-center gap-10 rounded-3xl border border-border bg-card p-8 sm:p-12 lg:grid-cols-2">
