@@ -117,14 +117,14 @@ export default function RegisterPage() {
   return (
     <div className="mx-auto flex min-h-[calc(100vh-14rem)] max-w-md flex-col justify-center px-4 py-12">
       <div className="rounded-2xl border border-border bg-card p-8 shadow-sm">
-        <div className="flex flex-col items-center text-center">
-          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary text-primary-foreground">
-            <Aperture className="h-6 w-6" />
+        <div className="space-y-1.5">
+          <div className="flex items-center gap-2.5">
+            <Aperture className="h-5 w-5 text-primary shrink-0" />
+            <h1 className="font-display text-2xl font-bold tracking-tight text-foreground">
+              Create your account
+            </h1>
           </div>
-          <h1 className="mt-4 font-display text-2xl font-bold tracking-tight text-foreground">
-            Create your StudioSpace account
-          </h1>
-          <p className="mt-1.5 text-sm text-muted-foreground">
+          <p className="text-sm text-muted-foreground">
             Book creative spaces or publish your own studio hours.
           </p>
         </div>
@@ -207,7 +207,7 @@ export default function RegisterPage() {
               </button>
             </div>
 
-            <div className="mt-2 space-y-1 rounded-lg border border-border bg-secondary/40 p-3 text-xs">
+            <div className="pt-2 space-y-1.5 text-xs">
               <p className="flex items-center gap-2">
                 {hasUppercase ? (
                   <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />

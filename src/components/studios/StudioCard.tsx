@@ -71,7 +71,7 @@ export function StudioCard({
   };
 
   return (
-    <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg">
+    <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border/90 bg-card transition-all duration-200 hover:-translate-y-0.5 hover:border-foreground/20 hover:shadow-[0_10px_30px_rgba(20,20,19,0.06)] dark:hover:shadow-[0_10px_30px_rgba(0,0,0,0.45)]">
       {/* Uniform 16:10 image */}
       <div className="relative aspect-[16/10] w-full overflow-hidden bg-muted">
         <Link href={`/studios/${studio._id}`} className="block h-full w-full">
@@ -79,7 +79,7 @@ export function StudioCard({
             src={studio.imageUrl}
             alt={studio.title}
             loading="lazy"
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
           />
         </Link>
 

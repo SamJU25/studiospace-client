@@ -27,6 +27,28 @@ function ExploreStudiosContent() {
   const [savedIds, setSavedIds] = React.useState<Set<string>>(new Set());
   const [fetchedKey, setFetchedKey] = React.useState<string>("");
 
+  const searchInputRef = React.useRef<HTMLInputElement>(null);
+
+  React.useEffect(() => {
+    const handleSlashFocus = (e: KeyboardEvent) => {
+      if (e.key !== "/" || e.metaKey || e.ctrlKey || e.altKey) return;
+      const target = e.target as HTMLElement | null;
+      const tag = target?.tagName?.toLowerCase();
+      if (
+        tag === "input" ||
+        tag === "textarea" ||
+        tag === "select" ||
+        target?.isContentEditable
+      ) {
+        return;
+      }
+      e.preventDefault();
+      searchInputRef.current?.focus();
+    };
+    window.addEventListener("keydown", handleSlashFocus);
+    return () => window.removeEventListener("keydown", handleSlashFocus);
+  }, []);
+
   React.useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(searchInput.trim());
@@ -133,12 +155,19 @@ function ExploreStudiosContent() {
           <div className="relative flex-1 max-w-md">
             <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
+              ref={searchInputRef}
               aria-label="Search studios by title, city, or gear"
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               placeholder="Search by title, city, or gear (e.g. Profoto, SM7B)..."
-              className="pl-10"
+              className="pl-10 pr-10"
             />
+            <kbd
+              aria-hidden="true"
+              className="pointer-events-none absolute right-3 top-1/2 hidden -translate-y-1/2 rounded border border-border bg-secondary px-1.5 py-0.5 font-mono text-[11px] text-muted-foreground sm:inline-block"
+            >
+              /
+            </kbd>
           </div>
 
           <div className="flex items-center gap-3">
@@ -213,11 +242,11 @@ function ExploreStudiosContent() {
         </div>
       ) : (
         <>
-          <p className="mt-6 text-sm text-muted-foreground tabular-nums">
-            Showing <strong className="text-foreground">{studios.length}</strong>{" "}
+          <h2 className="mt-6 text-sm font-normal text-muted-foreground tabular-nums">
+            Showing <strong className="font-semibold text-foreground">{studios.length}</strong>{" "}
             {studios.length === 1 ? "studio" : "studios"}
             {selectedCategory !== "All" ? ` in ${selectedCategory}` : ""}
-          </p>
+          </h2>
           <div className="mt-4 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {studios.map((studio) => (
               <StudioCard

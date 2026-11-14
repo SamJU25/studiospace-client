@@ -1,0 +1,25 @@
+# StudioSpace
+
+> Peer-to-peer creative production studio marketplace connecting photographers, filmmakers, podcasters, musicians, and makers with independent hourly studios.
+
+## Public Pages
+- `/` — Home overview with hero showcase, top 6 featured studios, studio categories, and workflow.
+- `/studios` — Full studio directory with category filtering, keyword search, sorting, and pagination.
+- `/studios/{id}` — Studio details, equipment gallery, live confirmed time slots, creator reviews, and booking modal.
+- `/login`, `/register` — Email/password and Google OAuth authentication powered by BetterAuth.
+
+## Private Workspace Routes (Session-Protected via `src/proxy.ts`)
+- `/dashboard` — Unified host and creator summary.
+- `/add-studio` — Publish a new studio listing.
+- `/my-listings`, `/studios/edit/{id}` — Manage and edit owned studios.
+- `/my-bookings` — Manage outgoing reservations, host confirmations, and PDF invoice downloads.
+- `/wishlist` — Saved studio bookmarks.
+
+## Backend API Summary (`NEXT_PUBLIC_API_URL`)
+- `GET /health` — Service health check.
+- `GET /api/studios/featured` — Top 6 featured studios.
+- `GET /api/studios?category=&search=&sort=&page=&limit=` — Filterable, paginated studio directory.
+- `GET /api/studios/:id` — Studio record with reviews and `confirmedSlots`.
+- `POST /api/bookings` — Submit booking request (`409 Conflict` if overlapping a `Confirmed` slot).
+- `PATCH /api/bookings/:id/status` — Host/guest status transitions (`Pending -> Confirmed | Cancelled`, `Confirmed -> Completed | Cancelled`).
+- Authentication for mutations accepts HTTPOnly `studiospace_token` cookie or `Authorization: Bearer <BetterAuth JWT>`.

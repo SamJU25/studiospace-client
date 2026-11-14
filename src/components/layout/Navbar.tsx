@@ -47,8 +47,18 @@ export function Navbar() {
         setDropdownOpen(false);
       }
     };
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setDropdownOpen(false);
+        setMobileOpen(false);
+      }
+    };
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      window.removeEventListener("keydown", handleKeyDown);
+    };
   }, []);
 
   const closeMenus = () => {
@@ -101,7 +111,7 @@ export function Navbar() {
                 className={cn(
                   "relative rounded-lg px-3.5 py-2 text-sm font-medium transition-colors",
                   isActive
-                    ? "text-primary bg-accent/80"
+                    ? "text-accent-foreground bg-accent"
                     : "text-muted-foreground hover:text-foreground hover:bg-secondary/70"
                 )}
               >
@@ -261,7 +271,7 @@ export function Navbar() {
                 className={cn(
                   "block rounded-lg px-3 py-2.5 text-sm font-medium",
                   isActive
-                    ? "bg-accent text-primary"
+                    ? "bg-accent text-accent-foreground"
                     : "text-foreground hover:bg-secondary"
                 )}
               >

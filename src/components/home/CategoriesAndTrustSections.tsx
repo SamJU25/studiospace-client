@@ -1,5 +1,6 @@
 import Link from "next/link";
 import {
+  ArrowUpRight,
   Camera,
   CheckCircle2,
   Clapperboard,
@@ -99,28 +100,32 @@ export function CategoriesAndTrustSections() {
             </p>
           </div>
 
-          <div className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-5">
+          <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
             {CATEGORY_CARDS.map((cat) => {
               const Icon = cat.icon;
               return (
                 <Link
                   key={cat.name}
                   href={`/studios?category=${encodeURIComponent(cat.name)}`}
-                  className="group relative flex h-64 flex-col justify-end overflow-hidden rounded-2xl border border-border bg-neutral-900 p-5 text-white transition-transform duration-200 hover:-translate-y-1"
+                  className="group relative flex h-64 flex-col justify-end overflow-hidden rounded-2xl border border-border/80 bg-neutral-900 p-5 text-white transition-all duration-200 hover:-translate-y-0.5 hover:border-white/30"
                 >
                   <img
                     src={cat.image}
                     alt={cat.name}
-                    className="absolute inset-0 h-full w-full object-cover opacity-75 transition-transform duration-500 group-hover:scale-105"
+                    loading="lazy"
+                    className="absolute inset-0 h-full w-full object-cover opacity-75 transition-transform duration-500 group-hover:scale-[1.03]"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/45 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
                   <div className="relative z-10 space-y-1.5">
-                    <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm">
-                      <Icon className="h-4 w-4" />
-                    </span>
-                    <h3 className="font-display text-lg font-bold">
-                      {cat.name}
-                    </h3>
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <Icon className="h-4 w-4 text-primary shrink-0" />
+                        <h3 className="font-display text-base font-bold tracking-tight">
+                          {cat.name}
+                        </h3>
+                      </div>
+                      <ArrowUpRight className="h-4 w-4 text-white/60 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-white shrink-0" />
+                    </div>
                     <p className="text-xs leading-relaxed text-neutral-200">
                       {cat.description}
                     </p>
@@ -132,12 +137,12 @@ export function CategoriesAndTrustSections() {
         </div>
       </section>
 
-      {/* Extra Section 1: How Booking Works */}
+      {/* Extra Section 1: How Booking Works — Hairline Bento Flow */}
       <section
         id="how-it-works"
         className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8"
       >
-        <div className="text-center max-w-2xl mx-auto">
+        <div className="max-w-2xl">
           <h2 className="font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
             How Booking Works
           </h2>
@@ -147,19 +152,20 @@ export function CategoriesAndTrustSections() {
           </p>
         </div>
 
-        <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {WORKFLOW_STEPS.map((item) => {
+        <div className="mt-10 grid grid-cols-1 divide-y divide-border overflow-hidden rounded-2xl border border-border bg-card sm:grid-cols-2 sm:divide-y-0 lg:grid-cols-4 lg:divide-x">
+          {WORKFLOW_STEPS.map((item, idx) => {
             const Icon = item.icon;
             return (
               <div
                 key={item.step}
-                className="flex flex-col rounded-2xl border border-border bg-card p-6"
+                className="flex flex-col p-6 sm:border-b lg:border-b-0 border-border transition-colors hover:bg-secondary/30"
               >
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-accent text-primary">
-                  <Icon className="h-5 w-5" />
+                <div className="flex items-center justify-between text-xs font-mono text-muted-foreground">
+                  <span>STEP 0{idx + 1}</span>
+                  <Icon className="h-4 w-4 text-primary" />
                 </div>
-                <h3 className="mt-5 font-display text-lg font-bold text-foreground">
-                  {item.step}
+                <h3 className="mt-5 font-display text-base font-bold tracking-tight text-foreground">
+                  {item.step.replace(/^\d+\.\s*/, "")}
                 </h3>
                 <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
                   {item.description}

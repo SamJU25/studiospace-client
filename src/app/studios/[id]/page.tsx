@@ -352,7 +352,7 @@ export default function StudioDetailsPage() {
             <h2 className="font-display text-xl font-bold text-foreground">
               Studio Overview
             </h2>
-            <p className="text-base leading-relaxed text-muted-foreground whitespace-pre-line">
+            <p className="max-w-xl text-base leading-relaxed text-muted-foreground whitespace-pre-line">
               {studio.description}
             </p>
           </section>

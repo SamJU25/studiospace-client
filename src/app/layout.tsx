@@ -30,9 +30,18 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
+  ),
   title: "StudioSpace — Peer-to-Peer Creative Production Studios",
   description:
     "Discover and book hourly photo studios, sound stages, podcast suites, music rooms, and maker workshops from local creators.",
+  openGraph: {
+    title: "StudioSpace — Peer-to-Peer Creative Production Studios",
+    description:
+      "Book verified creative production studios by the hour with real-time slot protection.",
+    type: "website",
+  },
 };
 
 export default function RootLayout({

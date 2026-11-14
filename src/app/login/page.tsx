@@ -85,14 +85,14 @@ function LoginForm() {
   return (
     <div className="mx-auto flex min-h-[calc(100vh-14rem)] max-w-md flex-col justify-center px-4 py-12">
       <div className="rounded-2xl border border-border bg-card p-8 shadow-sm">
-        <div className="flex flex-col items-center text-center">
-          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary text-primary-foreground">
-            <Aperture className="h-6 w-6" />
+        <div className="space-y-1.5">
+          <div className="flex items-center gap-2.5">
+            <Aperture className="h-5 w-5 text-primary shrink-0" />
+            <h1 className="font-display text-2xl font-bold tracking-tight text-foreground">
+              Sign in to StudioSpace
+            </h1>
           </div>
-          <h1 className="mt-4 font-display text-2xl font-bold tracking-tight text-foreground">
-            Sign in to StudioSpace
-          </h1>
-          <p className="mt-1.5 text-sm text-muted-foreground">
+          <p className="text-sm text-muted-foreground">
             Access your booked sessions, saved studios, and host listings.
           </p>
         </div>
