@@ -133,6 +133,7 @@ function ExploreStudiosContent() {
           <div className="relative flex-1 max-w-md">
             <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
+              aria-label="Search studios by title, city, or gear"
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               placeholder="Search by title, city, or gear (e.g. Profoto, SM7B)..."
@@ -167,9 +168,10 @@ function ExploreStudiosContent() {
               <button
                 key={cat}
                 type="button"
+                aria-pressed={active}
                 onClick={() => handleCategorySelect(cat)}
                 className={cn(
-                  "rounded-full border px-4 py-1.5 text-sm font-medium transition-colors cursor-pointer",
+                  "rounded-full border px-4 py-2 text-sm font-medium transition-colors cursor-pointer",
                   active
                     ? "border-primary bg-primary text-primary-foreground"
                     : "border-border bg-card text-muted-foreground hover:bg-secondary hover:text-foreground"

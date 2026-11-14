@@ -4,13 +4,10 @@ import * as React from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import {
-  AlertTriangle,
   ArrowLeft,
-  Calendar,
   CheckCircle2,
   Clock,
   Heart,
-  Loader2,
   MapPin,
   Shield,
   Star,
@@ -29,11 +26,10 @@ import type { ConfirmedSlot, Review, Studio } from "@/lib/types";
 import { cn, formatCurrency } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Modal } from "@/components/ui/modal";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
+import { StudioBookingModal } from "@/components/studios/StudioBookingModal";
 
 function calculateHours(start: string, end: string): number {
   if (!start || !end) return 0;
@@ -424,17 +420,23 @@ export default function StudioDetailsPage() {
               className="rounded-2xl border border-border bg-card p-5 space-y-4"
             >
               <div className="flex flex-wrap items-center justify-between gap-3">
-                <Label htmlFor="review-rating" className="font-semibold">
+                <Label id="review-rating-label" className="font-semibold">
                   Share your session experience
                 </Label>
-                <div className="flex items-center gap-1.5">
+                <div
+                  role="radiogroup"
+                  aria-labelledby="review-rating-label"
+                  className="flex items-center gap-1"
+                >
                   {[1, 2, 3, 4, 5].map((num) => (
                     <button
                       key={num}
                       type="button"
+                      role="radio"
+                      aria-checked={num === reviewRating}
                       onClick={() => setReviewRating(num)}
-                      aria-label={`Rate ${num} stars`}
-                      className="p-1 cursor-pointer"
+                      aria-label={`Rate ${num} star${num > 1 ? "s" : ""}`}
+                      className="inline-flex h-9 w-9 items-center justify-center rounded-lg hover:bg-secondary cursor-pointer transition-colors"
                     >
                       <Star
                         className={cn(
@@ -449,6 +451,8 @@ export default function StudioDetailsPage() {
                 </div>
               </div>
               <Textarea
+                id="review-comment"
+                aria-label="Review comment"
                 value={reviewComment}
                 onChange={(e) => setReviewComment(e.target.value)}
                 placeholder="How was the natural light, acoustic isolation, and host communication?"
@@ -550,107 +554,24 @@ export default function StudioDetailsPage() {
         </aside>
       </div>
 
-      {/* Booking Modal */}
-      <Modal
+      <StudioBookingModal
         open={bookingModalOpen}
         onClose={() => setBookingModalOpen(false)}
-        title={`Book ${studio.title}`}
-        description="Pick your date and session hours. Confirmed bookings are protected against overlapping time slots."
-      >
-        <form onSubmit={handleBookingSubmit} className="space-y-4">
-          {bookingError && (
-            <div className="flex items-start gap-2.5 rounded-xl border border-destructive/40 bg-destructive/10 p-3.5 text-sm text-destructive">
-              <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0" />
-              <span>{bookingError}</span>
-            </div>
-          )}
-
-          <div className="space-y-1.5">
-            <Label htmlFor="booking-date">Session Date</Label>
-            <div className="relative">
-              <Calendar className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                id="booking-date"
-                type="date"
-                required
-                min={new Date().toISOString().split("T")[0]}
-                value={bookingDate}
-                onChange={(e) => setBookingDate(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1.5">
-              <Label htmlFor="booking-start">Start Time</Label>
-              <Input
-                id="booking-start"
-                type="time"
-                required
-                value={startTime}
-                onChange={(e) => setStartTime(e.target.value)}
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="booking-end">End Time</Label>
-              <Input
-                id="booking-end"
-                type="time"
-                required
-                value={endTime}
-                onChange={(e) => setEndTime(e.target.value)}
-              />
-            </div>
-          </div>
-
-          <div className="space-y-1.5">
-            <Label htmlFor="booking-notes">Project Brief / Crew Notes</Label>
-            <Textarea
-              id="booking-notes"
-              value={projectNotes}
-              onChange={(e) => setProjectNotes(e.target.value)}
-              placeholder="Share crew count, lighting needs, or load-in timing..."
-              className="min-h-[80px]"
-            />
-          </div>
-
-          <div className="rounded-xl border border-border bg-secondary/45 p-4 text-sm space-y-1.5 tabular-nums">
-            <div className="flex justify-between text-muted-foreground">
-              <span>
-                {formatCurrency(studio.hourlyRate)} × {hours} hr(s)
-              </span>
-              <span className="font-semibold text-foreground">
-                ${estimatedTotal.toFixed(2)}
-              </span>
-            </div>
-            <div className="flex justify-between text-muted-foreground">
-              <span>Refundable Security Deposit</span>
-              <span>{formatCurrency(studio.securityDeposit)}</span>
-            </div>
-          </div>
-
-          <div className="flex justify-end gap-3 pt-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setBookingModalOpen(false)}
-            >
-              Cancel
-            </Button>
-            <Button type="submit" disabled={bookingSubmitting}>
-              {bookingSubmitting ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  Submitting...
-                </>
-              ) : (
-                "Confirm Booking Request"
-              )}
-            </Button>
-          </div>
-        </form>
-      </Modal>
+        studio={studio}
+        bookingDate={bookingDate}
+        onBookingDateChange={setBookingDate}
+        startTime={startTime}
+        onStartTimeChange={setStartTime}
+        endTime={endTime}
+        onEndTimeChange={setEndTime}
+        projectNotes={projectNotes}
+        onProjectNotesChange={setProjectNotes}
+        hours={hours}
+        estimatedTotal={estimatedTotal}
+        bookingError={bookingError}
+        bookingSubmitting={bookingSubmitting}
+        onSubmit={handleBookingSubmit}
+      />
     </div>
   );
 }

@@ -78,6 +78,7 @@ export function StudioCard({
           <img
             src={studio.imageUrl}
             alt={studio.title}
+            loading="lazy"
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
         </Link>
@@ -94,7 +95,7 @@ export function StudioCard({
           disabled={toggling}
           aria-label={saved ? "Remove from saved studios" : "Save studio"}
           className={cn(
-            "absolute right-3.5 top-3.5 flex h-9 w-9 items-center justify-center rounded-full border backdrop-blur-sm transition-colors cursor-pointer",
+            "absolute right-3 top-3 flex h-10 w-10 items-center justify-center rounded-full border backdrop-blur-sm transition-colors cursor-pointer",
             saved
               ? "border-primary bg-primary text-primary-foreground"
               : "border-white/30 bg-black/45 text-white hover:bg-black/65"

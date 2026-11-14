@@ -8,6 +8,7 @@ import { authClient } from "@/lib/auth-client";
 import { apiFetch } from "@/lib/api";
 import { uploadImageToImgbb } from "@/lib/imgbb";
 import { STUDIO_CATEGORIES, type Studio, type StudioCategory } from "@/lib/types";
+import { isSafeHttpUrl } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -107,6 +108,11 @@ export function StudioForm({ mode, initialStudio }: StudioFormProps) {
         .map((url) => url.trim())
         .filter(Boolean),
     ];
+
+    if (galleryImages.some((url) => !isSafeHttpUrl(url))) {
+      toast.error("All cover and gallery image URLs must use http:// or https://.");
+      return;
+    }
 
     setSubmitting(true);
     try {
