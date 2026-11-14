@@ -9,7 +9,7 @@ import {
   Palette,
   Search,
   ShieldCheck,
-  Sparkles,
+  FileCheck2,
   CalendarClock,
 } from "lucide-react";
 import type { StudioCategory } from "@/lib/types";
@@ -81,7 +81,7 @@ const WORKFLOW_STEPS = [
     step: "4. Create & Wrap",
     description:
       "Check in with your host, produce your session, and download your official PDF booking receipt.",
-    icon: Sparkles,
+    icon: FileCheck2,
   },
 ];
 

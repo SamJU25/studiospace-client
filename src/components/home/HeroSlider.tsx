@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, Compass, Sparkles } from "lucide-react";
+import { Aperture, ArrowRight, Compass } from "lucide-react";
 import { Autoplay, EffectFade, Navigation, Pagination } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
@@ -66,7 +66,7 @@ export function HeroSlider() {
               <div className="relative z-10 mx-auto flex h-full max-w-7xl flex-col justify-center px-4 sm:px-6 lg:px-8">
                 <div className="max-w-2xl space-y-5 text-white">
                   <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3.5 py-1.5 text-xs font-medium backdrop-blur-md">
-                    <Sparkles className="h-3.5 w-3.5 text-amber-400" />
+                    <Aperture className="h-3.5 w-3.5 text-amber-400" />
                     <span>{slide.highlight}</span>
                   </div>
 

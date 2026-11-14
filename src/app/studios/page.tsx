@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { RotateCcw, Search, SlidersHorizontal, Sparkles } from "lucide-react";
+import { Plus, RotateCcw, Search, SlidersHorizontal } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 import { apiFetch } from "@/lib/api";
 import { STUDIO_CATEGORIES, type Studio } from "@/lib/types";
@@ -151,7 +151,7 @@ function ExploreStudiosContent() {
 
         <Link href="/add-studio">
           <Button className="gap-2">
-            <Sparkles className="h-4 w-4" />
+            <Plus className="h-4 w-4" />
             Host Your Studio
           </Button>
         </Link>
