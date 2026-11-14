@@ -10,8 +10,16 @@ import { STUDIO_CATEGORIES, type Studio } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Select } from "@/components/ui/select";
 import { StudioCardSkeleton } from "@/components/ui/skeleton";
 import { StudioCard } from "@/components/studios/StudioCard";
+
+const SORT_OPTIONS = [
+  { value: "newest", label: "Newest Listed" },
+  { value: "rating", label: "Top Rated" },
+  { value: "price_asc", label: "Hourly Rate: Low to High" },
+  { value: "price_desc", label: "Hourly Rate: High to Low" },
+];
 
 function ExploreStudiosContent() {
   const router = useRouter();
@@ -175,17 +183,14 @@ function ExploreStudiosContent() {
               <SlidersHorizontal className="h-4 w-4" />
               <span>Sort:</span>
             </div>
-            <select
+            <Select
               value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              aria-label="Sort studios"
-              className="h-10 rounded-lg border border-input bg-card px-3 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            >
-              <option value="newest">Newest Listed</option>
-              <option value="rating">Top Rated</option>
-              <option value="price_asc">Hourly Rate: Low to High</option>
-              <option value="price_desc">Hourly Rate: High to Low</option>
-            </select>
+              onChange={setSortBy}
+              options={SORT_OPTIONS}
+              ariaLabel="Sort studios"
+              align="end"
+              className="min-w-[195px]"
+            />
           </div>
         </div>
 

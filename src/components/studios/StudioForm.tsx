@@ -12,6 +12,7 @@ import { isSafeHttpUrl } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 
 interface StudioFormProps {
@@ -185,18 +186,16 @@ export function StudioForm({ mode, initialStudio }: StudioFormProps) {
 
         <div className="space-y-1.5">
           <Label htmlFor="studio-category">Category *</Label>
-          <select
+          <Select
             id="studio-category"
             value={category}
-            onChange={(e) => setCategory(e.target.value as StudioCategory)}
-            className="flex h-10 w-full rounded-lg border border-input bg-card px-3.5 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          >
-            {STUDIO_CATEGORIES.map((cat) => (
-              <option key={cat} value={cat}>
-                {cat}
-              </option>
-            ))}
-          </select>
+            onChange={(val) => setCategory(val as StudioCategory)}
+            ariaLabel="Studio category"
+            options={STUDIO_CATEGORIES.map((cat) => ({
+              value: cat,
+              label: cat,
+            }))}
+          />
         </div>
 
         <div className="space-y-1.5">
